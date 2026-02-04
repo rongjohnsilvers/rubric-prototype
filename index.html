@@ -151,9 +151,52 @@
             color: #666;
         }
 
+        .student-table-header {
+            display: grid;
+            grid-template-columns: 1.5fr 1.5fr 1.2fr 1.2fr 0.8fr 150px;
+            padding: 16px 24px;
+            align-items: center;
+            gap: 16px;
+            background-color: #fafafa;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .sortable:hover {
+            color: #ff6600;
+        }
+
+        .sort-indicator {
+            font-size: 10px;
+            color: #999;
+            min-width: 12px;
+        }
+
+        .sort-indicator.active {
+            color: #ff6600;
+        }
+
+        .actions-header {
+            text-align: center;
+        }
+
         .student-item {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 150px;
+            grid-template-columns: 1.5fr 1.5fr 1.2fr 1.2fr 0.8fr 150px;
             padding: 20px 24px;
             border-bottom: 1px solid #f0f0f0;
             align-items: center;
@@ -163,6 +206,85 @@
 
         .student-item:hover {
             background-color: #fafafa;
+        }
+
+        .student-score {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .student-score.graded {
+            color: #388e3c;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hide-tablet {
+                display: none;
+            }
+
+            .student-table-header {
+                grid-template-columns: 1.5fr 1.5fr 1.2fr 150px;
+            }
+
+            .student-item {
+                grid-template-columns: 1.5fr 1.5fr 1.2fr 150px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hide-mobile {
+                display: none;
+            }
+
+            .student-table-header {
+                grid-template-columns: 1fr 1fr 120px;
+                font-size: 13px;
+                padding: 12px 16px;
+            }
+
+            .student-item {
+                grid-template-columns: 1fr 1fr 120px;
+                padding: 16px;
+            }
+
+            .main-content {
+                padding: 20px 16px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .status-badge {
+                font-size: 11px;
+                padding: 3px 8px;
+            }
+
+            .grade-btn, .continue-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .student-table-header {
+                grid-template-columns: 1fr 1fr 100px;
+                padding: 10px 12px;
+                gap: 8px;
+            }
+
+            .student-item {
+                grid-template-columns: 1fr 1fr 100px;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .grade-btn, .continue-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+                width: 100%;
+            }
         }
 
         .student-name {
@@ -584,46 +706,27 @@
                         <div class="student-stats">18 of 20 students completed • 5 graded • 13 pending</div>
                     </div>
 
-                    <div class="student-item" onclick="selectStudent(0)">
-                        <div class="student-name">Emma Thompson</div>
-                        <div>Submitted Jan 28</div>
-                        <div><span class="status-badge status-submitted">Submitted</span></div>
-                        <div><button class="grade-btn">Grade</button></div>
+                    <div class="table-header student-table-header">
+                        <div class="sortable" onclick="sortTable('lastName')">
+                            Last Name <span class="sort-indicator">▼</span>
+                        </div>
+                        <div class="sortable" onclick="sortTable('firstName')">
+                            First Name <span class="sort-indicator"></span>
+                        </div>
+                        <div class="sortable hide-mobile" onclick="sortTable('submittedDate')">
+                            Submitted <span class="sort-indicator"></span>
+                        </div>
+                        <div class="sortable hide-tablet" onclick="sortTable('status')">
+                            Status <span class="sort-indicator"></span>
+                        </div>
+                        <div class="sortable hide-tablet" onclick="sortTable('score')">
+                            Score <span class="sort-indicator"></span>
+                        </div>
+                        <div class="actions-header">Actions</div>
                     </div>
 
-                    <div class="student-item" onclick="selectStudent(1)">
-                        <div class="student-name">Marcus Chen</div>
-                        <div>Submitted Jan 29</div>
-                        <div><span class="status-badge status-submitted">Submitted</span></div>
-                        <div><button class="grade-btn">Grade</button></div>
-                    </div>
-
-                    <div class="student-item" onclick="selectStudent(2)">
-                        <div class="student-name">Sophia Rodriguez</div>
-                        <div>Submitted Jan 27</div>
-                        <div><span class="status-badge status-graded">Graded</span></div>
-                        <div><button class="continue-btn">View</button></div>
-                    </div>
-
-                    <div class="student-item" onclick="selectStudent(3)">
-                        <div class="student-name">Aiden Kumar</div>
-                        <div>Submitted Jan 29</div>
-                        <div><span class="status-badge status-submitted">Submitted</span></div>
-                        <div><button class="grade-btn">Grade</button></div>
-                    </div>
-
-                    <div class="student-item" onclick="selectStudent(4)">
-                        <div class="student-name">Olivia Washington</div>
-                        <div>Draft saved</div>
-                        <div><span class="status-badge status-pending">In Progress</span></div>
-                        <div><button class="continue-btn">Continue</button></div>
-                    </div>
-
-                    <div class="student-item" onclick="selectStudent(5)">
-                        <div class="student-name">Lucas Martinez</div>
-                        <div>Submitted Jan 30</div>
-                        <div><span class="status-badge status-submitted">Submitted</span></div>
-                        <div><button class="grade-btn">Grade</button></div>
+                    <div id="student-table-body">
+                        <!-- Student rows will be dynamically generated here -->
                     </div>
                 </div>
             </div>
@@ -744,14 +847,21 @@
         let currentPage = 'page-assignments';
         let currentStudentIndex = 0;
         let currentScore = null;
+        let currentSort = { column: 'lastName', ascending: true };
 
         const students = [
-            { name: 'Emma Thompson', status: 'submitted' },
-            { name: 'Marcus Chen', status: 'submitted' },
-            { name: 'Sophia Rodriguez', status: 'graded' },
-            { name: 'Aiden Kumar', status: 'submitted' },
-            { name: 'Olivia Washington', status: 'inprogress' },
-            { name: 'Lucas Martinez', status: 'submitted' }
+            { firstName: 'Emma', lastName: 'Thompson', status: 'submitted', submittedDate: '2025-01-28', score: null },
+            { firstName: 'Marcus', lastName: 'Chen', status: 'submitted', submittedDate: '2025-01-29', score: null },
+            { firstName: 'Sophia', lastName: 'Rodriguez', status: 'graded', submittedDate: '2025-01-27', score: 5 },
+            { firstName: 'Aiden', lastName: 'Kumar', status: 'submitted', submittedDate: '2025-01-29', score: null },
+            { firstName: 'Olivia', lastName: 'Washington', status: 'inprogress', submittedDate: null, score: null },
+            { firstName: 'Lucas', lastName: 'Martinez', status: 'submitted', submittedDate: '2025-01-30', score: null },
+            { firstName: 'Isabella', lastName: 'Anderson', status: 'graded', submittedDate: '2025-01-28', score: 4 },
+            { firstName: 'Ethan', lastName: 'Brown', status: 'submitted', submittedDate: '2025-01-29', score: null },
+            { firstName: 'Ava', lastName: 'Davis', status: 'graded', submittedDate: '2025-01-27', score: 5 },
+            { firstName: 'Noah', lastName: 'Garcia', status: 'submitted', submittedDate: '2025-01-30', score: null },
+            { firstName: 'Mia', lastName: 'Johnson', status: 'graded', submittedDate: '2025-01-28', score: 3 },
+            { firstName: 'Liam', lastName: 'Lee', status: 'submitted', submittedDate: '2025-01-29', score: null }
         ];
 
         const scoreDescriptions = {
@@ -787,11 +897,106 @@
             });
             document.getElementById(pageId).classList.add('active');
             currentPage = pageId;
+
+            // Render student table when navigating to students page
+            if (pageId === 'page-students') {
+                renderStudentTable();
+            }
+        }
+
+        function sortTable(column) {
+            // Toggle sort direction if clicking same column
+            if (currentSort.column === column) {
+                currentSort.ascending = !currentSort.ascending;
+            } else {
+                currentSort.column = column;
+                currentSort.ascending = true;
+            }
+
+            renderStudentTable();
+        }
+
+        function renderStudentTable() {
+            // Sort students
+            const sortedStudents = [...students].sort((a, b) => {
+                let aVal = a[currentSort.column];
+                let bVal = b[currentSort.column];
+
+                // Handle null values
+                if (aVal === null) return 1;
+                if (bVal === null) return -1;
+
+                // Handle score sorting (numerical)
+                if (currentSort.column === 'score') {
+                    aVal = aVal || 0;
+                    bVal = bVal || 0;
+                    return currentSort.ascending ? aVal - bVal : bVal - aVal;
+                }
+
+                // String comparison
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+
+                if (aVal < bVal) return currentSort.ascending ? -1 : 1;
+                if (aVal > bVal) return currentSort.ascending ? 1 : -1;
+                return 0;
+            });
+
+            // Update sort indicators
+            document.querySelectorAll('.sort-indicator').forEach(indicator => {
+                indicator.textContent = '';
+                indicator.classList.remove('active');
+            });
+
+            const headers = document.querySelectorAll('.sortable');
+            headers.forEach(header => {
+                const onclick = header.getAttribute('onclick');
+                if (onclick && onclick.includes(currentSort.column)) {
+                    const indicator = header.querySelector('.sort-indicator');
+                    indicator.textContent = currentSort.ascending ? '▼' : '▲';
+                    indicator.classList.add('active');
+                }
+            });
+
+            // Render table rows
+            const tableBody = document.getElementById('student-table-body');
+            tableBody.innerHTML = sortedStudents.map((student, index) => {
+                const originalIndex = students.indexOf(student);
+                const statusClass = student.status === 'graded' ? 'status-graded' :
+                                   student.status === 'inprogress' ? 'status-pending' : 'status-submitted';
+                const statusText = student.status === 'graded' ? 'Graded' :
+                                  student.status === 'inprogress' ? 'In Progress' : 'Submitted';
+                const buttonClass = student.status === 'graded' || student.status === 'inprogress' ? 'continue-btn' : 'grade-btn';
+                const buttonText = student.status === 'graded' ? 'View' :
+                                   student.status === 'inprogress' ? 'Continue' : 'Grade';
+
+                const submittedText = student.submittedDate ?
+                    new Date(student.submittedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
+                    'Not submitted';
+
+                const scoreDisplay = student.score !== null ?
+                    `<span class="student-score graded">${student.score} / 5</span>` :
+                    '<span class="student-score">—</span>';
+
+                return `
+                    <div class="student-item" onclick="selectStudent(${originalIndex})">
+                        <div class="student-name">${student.lastName}</div>
+                        <div class="student-name">${student.firstName}</div>
+                        <div class="hide-mobile">${submittedText}</div>
+                        <div class="hide-tablet"><span class="status-badge ${statusClass}">${statusText}</span></div>
+                        <div class="hide-tablet">${scoreDisplay}</div>
+                        <div><button class="${buttonClass}" onclick="event.stopPropagation(); selectStudent(${originalIndex});">${buttonText}</button></div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function selectStudent(index) {
             currentStudentIndex = index;
-            document.getElementById('grading-student-name').textContent = `Grading: ${students[index].name}`;
+            const student = students[index];
+            document.getElementById('grading-student-name').textContent = `Grading: ${student.firstName} ${student.lastName}`;
 
             // Reset rubric
             currentScore = null;
@@ -854,8 +1059,13 @@
                 return;
             }
 
-            const studentName = students[currentStudentIndex].name;
+            const student = students[currentStudentIndex];
+            const studentName = `${student.firstName} ${student.lastName}`;
             document.getElementById('graded-student-name').textContent = studentName;
+
+            // Update student record with score and status
+            students[currentStudentIndex].score = currentScore;
+            students[currentStudentIndex].status = 'graded';
 
             // Show success message
             const successMsg = document.getElementById('success-message');
@@ -897,6 +1107,11 @@
                 console.log('Auto-saving progress...');
             }
         }, 30000); // Every 30 seconds
+
+        // Initialize - sort by last name on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            renderStudentTable();
+        });
     </script>
 </body>
 </html>
