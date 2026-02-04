@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubric Grading Prototype</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 56px;
+            background-color: #fff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+        }
+
+        .sidebar-icon {
+            width: 32px;
+            height: 32px;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 4px;
+            color: #666;
+        }
+
+        .sidebar-icon:hover {
+            background-color: #f0f0f0;
+        }
+
+        .sidebar-icon.active {
+            color: #ff6600;
+            border-left: 3px solid #ff6600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 60px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #333;
+        }
+
+        /* Assignments Table */
+        .assignments-table {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header, .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr 200px 50px;
+            padding: 16px 24px;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .table-header {
+            background-color: #fafafa;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table-row {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .table-row:hover {
+            background-color: #fafafa;
+        }
+
+        .review-btn {
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .review-btn:hover {
+            background-color: #e55a00;
+        }
+
+        .menu-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
+
+        /* Student List */
+        .student-list {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .student-header {
+            padding: 24px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .student-header h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .student-stats {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .student-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 150px;
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+            cursor: pointer;
+            gap: 16px;
+        }
+
+        .student-item:hover {
+            background-color: #fafafa;
+        }
+
+        .student-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-submitted {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-graded {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-pending {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .grade-btn {
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .continue-btn {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* Grading Interface */
+        .grading-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            height: calc(100vh - 120px);
+        }
+
+        .grading-panel {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            background-color: #fafafa;
+        }
+
+        .panel-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .panel-subheader {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* Student Work */
+        .question-block {
+            margin-bottom: 32px;
+        }
+
+        .question-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-text {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .student-response {
+            background-color: #f9f9f9;
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 3px solid #1976d2;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* Rubric */
+        .rubric-item {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .rubric-item:last-child {
+            border-bottom: none;
+        }
+
+        .rubric-criterion {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .rubric-points {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .point-option {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+
+        .point-option:hover {
+            border-color: #ff6600;
+        }
+
+        .point-option.selected {
+            background-color: #ff6600;
+            border-color: #ff6600;
+            color: white;
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            margin-top: 8px;
+        }
+
+        .feedback-textarea:focus {
+            outline: none;
+            border-color: #ff6600;
+        }
+
+        .ai-assist-btn {
+            background-color: #9c27b0;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ai-assist-btn:hover {
+            background-color: #7b1fa2;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-top: 1px solid #e0e0e0;
+            background-color: #fafafa;
+        }
+
+        .score-display {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            background-color: #fff;
+            color: #666;
+            border: 1px solid #e0e0e0;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f5f5f5;
+        }
+
+        .btn-primary {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+
+        .student-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            background-color: #fff;
+            color: #666;
+            border: 1px solid #e0e0e0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .nav-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .back-link {
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .overall-feedback {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .overall-feedback h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .saved-indicator {
+            display: none;
+            color: #4caf50;
+            font-size: 13px;
+            font-weight: 500;
+            animation: fadeIn 0.3s;
+        }
+
+        .saved-indicator.show {
+            display: inline-block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .success-message {
+            display: none;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 16px 24px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .lesson-objectives {
+            background-color: #f9f9f9;
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 3px solid #1976d2;
+            margin-bottom: 20px;
+        }
+
+        .lesson-objectives ul {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0 0;
+        }
+
+        .lesson-objectives li {
+            padding: 6px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .rubric-points {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .point-option {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-icon active">📚</div>
+            <div class="sidebar-icon">🔍</div>
+            <div class="sidebar-icon">📋</div>
+            <div class="sidebar-icon">💬</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Page 1: Assignments List -->
+            <div id="page-assignments" class="page active">
+                <h1>Assignments</h1>
+                <div class="assignments-table">
+                    <div class="table-header">
+                        <div>Assignment Name</div>
+                        <div>Assigned to</div>
+                        <div>Completed by</div>
+                        <div>Due Date</div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="table-row">
+                        <div>9.1.3. Our Digital Habits</div>
+                        <div>Advisory 1</div>
+                        <div>18/20 students</div>
+                        <div>January 30, 2025</div>
+                        <div>
+                            <button class="review-btn" onclick="goToPage('page-students')">Review Responses</button>
+                        </div>
+                        <div class="menu-btn">⋮</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 2: Student List -->
+            <div id="page-students" class="page">
+                <a href="#" class="back-link" onclick="goToPage('page-assignments'); return false;">← Back to Assignments</a>
+                <h1>9.1.3. Our Digital Habits</h1>
+
+                <div id="success-message" class="success-message">
+                    ✓ Rubric submitted successfully for <span id="graded-student-name"></span>
+                </div>
+
+                <div class="student-list">
+                    <div class="student-header">
+                        <h2>Student Responses</h2>
+                        <div class="student-stats">18 of 20 students completed • 5 graded • 13 pending</div>
+                    </div>
+
+                    <div class="student-item" onclick="selectStudent(0)">
+                        <div class="student-name">Emma Thompson</div>
+                        <div>Submitted Jan 28</div>
+                        <div><span class="status-badge status-submitted">Submitted</span></div>
+                        <div><button class="grade-btn">Grade</button></div>
+                    </div>
+
+                    <div class="student-item" onclick="selectStudent(1)">
+                        <div class="student-name">Marcus Chen</div>
+                        <div>Submitted Jan 29</div>
+                        <div><span class="status-badge status-submitted">Submitted</span></div>
+                        <div><button class="grade-btn">Grade</button></div>
+                    </div>
+
+                    <div class="student-item" onclick="selectStudent(2)">
+                        <div class="student-name">Sophia Rodriguez</div>
+                        <div>Submitted Jan 27</div>
+                        <div><span class="status-badge status-graded">Graded</span></div>
+                        <div><button class="continue-btn">View</button></div>
+                    </div>
+
+                    <div class="student-item" onclick="selectStudent(3)">
+                        <div class="student-name">Aiden Kumar</div>
+                        <div>Submitted Jan 29</div>
+                        <div><span class="status-badge status-submitted">Submitted</span></div>
+                        <div><button class="grade-btn">Grade</button></div>
+                    </div>
+
+                    <div class="student-item" onclick="selectStudent(4)">
+                        <div class="student-name">Olivia Washington</div>
+                        <div>Draft saved</div>
+                        <div><span class="status-badge status-pending">In Progress</span></div>
+                        <div><button class="continue-btn">Continue</button></div>
+                    </div>
+
+                    <div class="student-item" onclick="selectStudent(5)">
+                        <div class="student-name">Lucas Martinez</div>
+                        <div>Submitted Jan 30</div>
+                        <div><span class="status-badge status-submitted">Submitted</span></div>
+                        <div><button class="grade-btn">Grade</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 3: Grading Interface -->
+            <div id="page-grading" class="page">
+                <a href="#" class="back-link" onclick="goToPage('page-students'); return false;">← Back to Student List</a>
+                <h1 id="grading-student-name">Grading: Emma Thompson</h1>
+
+                <div class="grading-layout">
+                    <!-- Left Panel: Student Work -->
+                    <div class="grading-panel">
+                        <div class="panel-header">
+                            <h3>Student Submission</h3>
+                            <div class="panel-subheader">Submitted on January 28, 2025</div>
+                        </div>
+                        <div class="panel-content">
+                            <div class="question-block">
+                                <div class="question-label">Section 1: Digital Behaviors</div>
+                                <div class="question-text">Reflect on the digital habit statements below. Mark one or two that feel most true for you, then write them in your own words.</div>
+                                <div class="student-response">
+                                    <strong>Selected behaviors:</strong><br>
+                                    ✓ I look at my phone or other digital devices when I get a notification, even when I'm talking to someone else in person.<br>
+                                    ✓ When I go out somewhere, hang out with someone, or am making something, I think about how I might post about it.<br>
+                                    ✓ I check my phone as soon as I wake up, whenever I'm waiting for something, or when I'm bored.<br><br>
+
+                                    <strong>In my own words:</strong><br>
+                                    "I constantly check my phone for notifications even during conversations, which makes me less present. I also find myself thinking about posting on social media whenever something interesting happens, and I automatically reach for my phone whenever there's a quiet moment."
+                                </div>
+                            </div>
+
+                            <div class="question-block">
+                                <div class="question-label">Section 2: Core Needs</div>
+                                <div class="question-text">Which of these core needs feels most connected to your habit? Mark one or two.</div>
+                                <div class="student-response">
+                                    <strong>Selected core needs:</strong><br>
+                                    ✓ Connection: "I want to feel connection with others."<br>
+                                    ✓ Acceptance: "I want to feel accepted."<br><br>
+
+                                    <strong>Reflection:</strong><br>
+                                    "My phone habits are driven by wanting to stay connected with my friends and feeling like I need to respond quickly to messages. I also worry about missing out on social interactions online, and posting content makes me feel validated when people engage with it."
+                                </div>
+                            </div>
+
+                            <div class="question-block">
+                                <div class="question-label">Section 3: Future Changes</div>
+                                <div class="question-text">Write down 1-3 digital habits you want to try to change in the future.</div>
+                                <div class="student-response">
+                                    1. <strong>Be more present during in-person conversations</strong> - Put my phone face-down or in my pocket when hanging out with friends and family, and resist checking notifications until the conversation is over.<br><br>
+
+                                    2. <strong>Reduce mindless scrolling</strong> - Set app time limits on social media (30 minutes per day) and use that time more intentionally instead of scrolling when bored.<br><br>
+
+                                    3. <strong>Create phone-free morning and evening routines</strong> - Don't check my phone for the first 30 minutes after waking up, and put it away 1 hour before bed to improve my sleep and start/end my day more mindfully.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Rubric -->
+                    <div class="grading-panel">
+                        <div class="panel-header">
+                            <h3>Grading Rubric</h3>
+                            <div class="panel-subheader">Score: <span id="total-score">Not Yet Scored</span></div>
+                        </div>
+                        <div class="panel-content">
+                            <div class="rubric-item">
+                                <div class="rubric-criterion">Lesson Objectives</div>
+                                <div class="question-text" style="font-size: 13px; color: #666; margin-bottom: 16px;">
+                                    • Students will be able to <strong>interpret the "Why" behind their digital habits</strong><br>
+                                    • Students will be able to <strong>critique how their digital habits impact their lives</strong>
+                                </div>
+
+                                <div class="rubric-criterion" style="margin-top: 20px;">Select Score</div>
+                                <div class="rubric-points">
+                                    <div class="point-option" data-points="5" onclick="selectPoints(this)">5 - Excellent</div>
+                                    <div class="point-option" data-points="4" onclick="selectPoints(this)">4 - Good</div>
+                                    <div class="point-option" data-points="3" onclick="selectPoints(this)">3 - Satisfactory</div>
+                                    <div class="point-option" data-points="2" onclick="selectPoints(this)">2 - Limited</div>
+                                    <div class="point-option" data-points="1" onclick="selectPoints(this)">1 - Insufficient</div>
+                                    <div class="point-option" data-points="0" onclick="selectPoints(this)">0 - No Evidence</div>
+                                </div>
+
+                                <div id="score-description" style="background-color: #f0f7ff; padding: 16px; border-radius: 6px; margin-top: 16px; font-size: 13px; line-height: 1.6; display: none;">
+                                    <strong id="score-title"></strong><br>
+                                    <span id="score-text"></span>
+                                </div>
+
+                                <button class="ai-assist-btn" onclick="aiAssist()" style="margin-top: 16px;">✨ AI-Assisted Grading</button>
+                            </div>
+
+                            <div class="overall-feedback">
+                                <h4>Feedback & Comments</h4>
+                                <textarea class="feedback-textarea" placeholder="Provide feedback on the student's work. Consider:\n• How well they identified and explained the 'why' behind their digital habits\n• Their critique of how these habits impact their lives\n• The thoughtfulness of their proposed changes"></textarea>
+                                <button class="ai-assist-btn" onclick="aiAssistOverall()">✨ Generate AI Feedback</button>
+                            </div>
+                        </div>
+                        <div class="action-bar">
+                            <div>
+                                <div class="score-display">Score: <span id="current-score">—</span> / 5</div>
+                                <span class="saved-indicator" id="saved-indicator">✓ Progress saved</span>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn-secondary" onclick="saveProgress()">Save & Exit</button>
+                                <div class="student-nav">
+                                    <button class="nav-btn" onclick="previousStudent()">← Previous</button>
+                                    <button class="nav-btn" onclick="nextStudent()">Next →</button>
+                                </div>
+                                <button class="btn-primary" onclick="submitRubric()">Submit Grade</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 'page-assignments';
+        let currentStudentIndex = 0;
+        let currentScore = null;
+
+        const students = [
+            { name: 'Emma Thompson', status: 'submitted' },
+            { name: 'Marcus Chen', status: 'submitted' },
+            { name: 'Sophia Rodriguez', status: 'graded' },
+            { name: 'Aiden Kumar', status: 'submitted' },
+            { name: 'Olivia Washington', status: 'inprogress' },
+            { name: 'Lucas Martinez', status: 'submitted' }
+        ];
+
+        const scoreDescriptions = {
+            5: {
+                title: '5 – Excellent',
+                text: 'Fully meets the lesson objectives. The response is accurate, complete, and clearly explained in the student\'s own words.'
+            },
+            4: {
+                title: '4 – Good',
+                text: 'Mostly meets the lesson objectives with minor gaps or slight lack of clarity.'
+            },
+            3: {
+                title: '3 – Satisfactory',
+                text: 'Partially meets the lesson objectives. Understanding or explanation is incomplete or somewhat unclear.'
+            },
+            2: {
+                title: '2 – Limited',
+                text: 'Minimally meets the lesson objectives. Significant gaps in understanding and/or unclear explanation.'
+            },
+            1: {
+                title: '1 – Insufficient',
+                text: 'Does not meaningfully meet the lesson objectives. Explanation is very unclear or largely incomplete.'
+            },
+            0: {
+                title: '0 – No Evidence',
+                text: 'Response is missing, off-topic, or shows no evidence of meeting the lesson objectives.'
+            }
+        };
+
+        function goToPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            currentPage = pageId;
+        }
+
+        function selectStudent(index) {
+            currentStudentIndex = index;
+            document.getElementById('grading-student-name').textContent = `Grading: ${students[index].name}`;
+
+            // Reset rubric
+            currentScore = null;
+            document.querySelectorAll('.point-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelectorAll('.feedback-textarea').forEach(textarea => {
+                textarea.value = '';
+            });
+            document.getElementById('score-description').style.display = 'none';
+            updateScore();
+
+            goToPage('page-grading');
+        }
+
+        function selectPoints(element) {
+            const points = parseInt(element.dataset.points);
+
+            // Remove selection from siblings
+            const siblings = element.parentElement.querySelectorAll('.point-option');
+            siblings.forEach(sib => sib.classList.remove('selected'));
+
+            // Add selection to clicked element
+            element.classList.add('selected');
+
+            // Update score
+            currentScore = points;
+            updateScore();
+
+            // Show score description
+            const descBox = document.getElementById('score-description');
+            const desc = scoreDescriptions[points];
+            document.getElementById('score-title').textContent = desc.title;
+            document.getElementById('score-text').textContent = desc.text;
+            descBox.style.display = 'block';
+        }
+
+        function updateScore() {
+            if (currentScore !== null) {
+                document.getElementById('current-score').textContent = currentScore;
+                document.getElementById('total-score').textContent = `${currentScore} / 5`;
+            } else {
+                document.getElementById('current-score').textContent = '—';
+                document.getElementById('total-score').textContent = 'Not Yet Scored';
+            }
+        }
+
+        function saveProgress() {
+            const indicator = document.getElementById('saved-indicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+                goToPage('page-students');
+            }, 1500);
+        }
+
+        function submitRubric() {
+            if (currentScore === null) {
+                alert('Please select a score before submitting.');
+                return;
+            }
+
+            const studentName = students[currentStudentIndex].name;
+            document.getElementById('graded-student-name').textContent = studentName;
+
+            // Show success message
+            const successMsg = document.getElementById('success-message');
+            successMsg.classList.add('show');
+
+            // Reset and go back
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 5000);
+
+            goToPage('page-students');
+        }
+
+        function previousStudent() {
+            if (currentStudentIndex > 0) {
+                selectStudent(currentStudentIndex - 1);
+            }
+        }
+
+        function nextStudent() {
+            if (currentStudentIndex < students.length - 1) {
+                selectStudent(currentStudentIndex + 1);
+            }
+        }
+
+        function aiAssist() {
+            alert('AI-Assisted Grading:\n\nThis feature would analyze the student\'s submission against the lesson objectives and suggest:\n\n• Recommended score (0-5) with justification\n• Evidence from the student\'s work supporting the score\n• Specific strengths demonstrated\n• Areas for improvement\n\nFor this submission, it might suggest:\n"Recommended: 4-5 points\n\nThe student demonstrates strong understanding of the \'why\' behind their digital habits by connecting them to core needs (connection & acceptance). They provide thoughtful critique of impacts and propose specific, actionable changes with clear reasoning."');
+        }
+
+        function aiAssistOverall() {
+            alert('Generate AI Feedback:\n\nThis feature would create personalized, constructive feedback based on:\n\n• The student\'s responses across all sections\n• Their score and how they met the objectives\n• Your teaching voice and feedback style\n• Actionable next steps for improvement\n\nExample feedback:\n"Excellent work connecting your digital habits to your core needs for connection and acceptance. Your self-awareness is strong, especially in recognizing how notifications pull you away from in-person conversations. Your proposed changes are specific and realistic. Consider tracking your progress for one week and reflecting on what challenges you encounter."');
+        }
+
+        // Auto-save simulation
+        setInterval(() => {
+            // Check if we're on grading page and there is a score
+            if (currentPage === 'page-grading' && currentScore !== null) {
+                // Simulate auto-save (in real app, this would save to backend)
+                console.log('Auto-saving progress...');
+            }
+        }, 30000); // Every 30 seconds
+    </script>
+</body>
+</html>
