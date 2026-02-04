@@ -652,6 +652,35 @@
         .point-option {
             text-align: center;
         }
+
+        .ai-suggested {
+            position: relative;
+        }
+
+        .ai-suggested::after {
+            content: '✨ AI Suggested';
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #9c27b0;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .submitted-message {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #2e7d32;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .submitted-message.show {
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -748,12 +777,16 @@
                                 <div class="question-label">Section 1: Digital Behaviors</div>
                                 <div class="question-text">Reflect on the digital habit statements below. Mark one or two that feel most true for you, then write them in your own words.</div>
                                 <div class="student-response">
-                                    <strong>Selected behaviors:</strong><br>
+                                    <strong>Student's selections:</strong><br>
                                     ✓ I look at my phone or other digital devices when I get a notification, even when I'm talking to someone else in person.<br>
                                     ✓ When I go out somewhere, hang out with someone, or am making something, I think about how I might post about it.<br>
                                     ✓ I check my phone as soon as I wake up, whenever I'm waiting for something, or when I'm bored.<br><br>
 
-                                    <strong>In my own words:</strong><br>
+                                    <strong>Not selected:</strong><br>
+                                    ○ I spend more time than I'd like to scrolling through social media or other apps, and I have a hard time controlling it.<br>
+                                    ○ I feel anxious when I don't have my phone with me or when the battery is low.<br><br>
+
+                                    <strong>In their own words:</strong><br>
                                     "I constantly check my phone for notifications even during conversations, which makes me less present. I also find myself thinking about posting on social media whenever something interesting happens, and I automatically reach for my phone whenever there's a quiet moment."
                                 </div>
                             </div>
@@ -762,11 +795,16 @@
                                 <div class="question-label">Section 2: Core Needs</div>
                                 <div class="question-text">Which of these core needs feels most connected to your habit? Mark one or two.</div>
                                 <div class="student-response">
-                                    <strong>Selected core needs:</strong><br>
+                                    <strong>Student's selections:</strong><br>
                                     ✓ Connection: "I want to feel connection with others."<br>
                                     ✓ Acceptance: "I want to feel accepted."<br><br>
 
-                                    <strong>Reflection:</strong><br>
+                                    <strong>Not selected:</strong><br>
+                                    ○ Curiosity: "I want to explore and learn."<br>
+                                    ○ Control: "I want to feel in control."<br>
+                                    ○ Stimulation: "I want to feel entertained or excited."<br><br>
+
+                                    <strong>Their reflection:</strong><br>
                                     "My phone habits are driven by wanting to stay connected with my friends and feeling like I need to respond quickly to messages. I also worry about missing out on social interactions online, and posting content makes me feel validated when people engage with it."
                                 </div>
                             </div>
@@ -813,14 +851,11 @@
                                     <strong id="score-title"></strong><br>
                                     <span id="score-text"></span>
                                 </div>
-
-                                <button class="ai-assist-btn" onclick="aiAssist()" style="margin-top: 16px;">✨ AI-Assisted Grading</button>
                             </div>
 
                             <div class="overall-feedback">
                                 <h4>Feedback & Comments</h4>
-                                <textarea class="feedback-textarea" placeholder="Provide feedback on the student's work. Consider:\n• How well they identified and explained the 'why' behind their digital habits\n• Their critique of how these habits impact their lives\n• The thoughtfulness of their proposed changes"></textarea>
-                                <button class="ai-assist-btn" onclick="aiAssistOverall()">✨ Generate AI Feedback</button>
+                                <textarea id="feedback-textarea" class="feedback-textarea" placeholder="Provide feedback on the student's work. Consider:\n• How well they identified and explained the 'why' behind their digital habits\n• Their critique of how these habits impact their lives\n• The thoughtfulness of their proposed changes"></textarea>
                             </div>
                         </div>
                         <div class="action-bar">
@@ -834,7 +869,12 @@
                                     <button class="nav-btn" onclick="previousStudent()">← Previous</button>
                                     <button class="nav-btn" onclick="nextStudent()">Next →</button>
                                 </div>
-                                <button class="btn-primary" onclick="submitRubric()">Submit Grade</button>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div class="submitted-message" id="submitted-message">
+                                        <span>✓ Submitted successfully</span>
+                                    </div>
+                                    <button class="btn-primary" id="submit-btn" onclick="submitRubric()">Submit Grade</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -848,6 +888,7 @@
         let currentStudentIndex = 0;
         let currentScore = null;
         let currentSort = { column: 'lastName', ascending: true };
+        let isSubmitted = false;
 
         const students = [
             { firstName: 'Emma', lastName: 'Thompson', status: 'submitted', submittedDate: '2025-01-28', score: null },
@@ -998,28 +1039,51 @@
             const student = students[index];
             document.getElementById('grading-student-name').textContent = `Grading: ${student.firstName} ${student.lastName}`;
 
+            // Reset submission state
+            isSubmitted = false;
+            document.getElementById('submitted-message').classList.remove('show');
+            document.getElementById('submit-btn').textContent = 'Submit Grade';
+
             // Reset rubric
             currentScore = null;
             document.querySelectorAll('.point-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            document.querySelectorAll('.feedback-textarea').forEach(textarea => {
-                textarea.value = '';
+                opt.classList.remove('selected', 'ai-suggested');
             });
             document.getElementById('score-description').style.display = 'none';
-            updateScore();
 
+            // Pre-select AI-suggested score (4 points for this example)
+            const suggestedScore = 4;
+            const suggestedOption = document.querySelector(`.point-option[data-points="${suggestedScore}"]`);
+            if (suggestedOption) {
+                suggestedOption.classList.add('selected', 'ai-suggested');
+                currentScore = suggestedScore;
+
+                // Show score description
+                const descBox = document.getElementById('score-description');
+                const desc = scoreDescriptions[suggestedScore];
+                document.getElementById('score-title').textContent = desc.title;
+                document.getElementById('score-text').textContent = desc.text;
+                descBox.style.display = 'block';
+            }
+
+            // Pre-populate AI-generated feedback
+            const feedbackTextarea = document.getElementById('feedback-textarea');
+            feedbackTextarea.value = `Excellent work connecting your digital habits to your core needs for connection and acceptance. Your self-awareness is strong, especially in recognizing how notifications pull you away from in-person conversations.\n\nYour proposed changes are specific and realistic - the phone-free morning/evening routine and setting app time limits show thoughtful planning. Consider tracking your progress for one week and reflecting on what challenges you encounter.\n\nOne area to strengthen: You could explore alternative ways to meet your needs for connection and acceptance that don't rely on constant digital checking. What offline activities give you similar feelings?`;
+
+            updateScore();
             goToPage('page-grading');
         }
 
         function selectPoints(element) {
             const points = parseInt(element.dataset.points);
 
-            // Remove selection from siblings
+            // Remove selection and AI indicator from siblings
             const siblings = element.parentElement.querySelectorAll('.point-option');
-            siblings.forEach(sib => sib.classList.remove('selected'));
+            siblings.forEach(sib => {
+                sib.classList.remove('selected', 'ai-suggested');
+            });
 
-            // Add selection to clicked element
+            // Add selection to clicked element (without AI indicator)
             element.classList.add('selected');
 
             // Update score
@@ -1060,23 +1124,20 @@
             }
 
             const student = students[currentStudentIndex];
-            const studentName = `${student.firstName} ${student.lastName}`;
-            document.getElementById('graded-student-name').textContent = studentName;
 
             // Update student record with score and status
             students[currentStudentIndex].score = currentScore;
             students[currentStudentIndex].status = 'graded';
 
-            // Show success message
-            const successMsg = document.getElementById('success-message');
-            successMsg.classList.add('show');
+            // Update UI to show submitted state
+            isSubmitted = true;
+            document.getElementById('submitted-message').classList.add('show');
+            document.getElementById('submit-btn').textContent = 'Resubmit';
 
-            // Reset and go back
-            setTimeout(() => {
-                successMsg.classList.remove('show');
-            }, 5000);
-
-            goToPage('page-students');
+            // Remove AI suggested indicator after submission
+            document.querySelectorAll('.point-option').forEach(opt => {
+                opt.classList.remove('ai-suggested');
+            });
         }
 
         function previousStudent() {
