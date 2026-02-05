@@ -345,7 +345,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
-            height: calc(100vh - 120px);
+            align-items: start;
         }
 
         .grading-panel {
@@ -354,7 +354,12 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+        }
+
+        .grading-panel.sticky {
+            position: sticky;
+            top: 24px;
+            align-self: start;
         }
 
         .panel-header {
@@ -376,8 +381,6 @@
         }
 
         .panel-content {
-            flex: 1;
-            overflow-y: auto;
             padding: 24px;
         }
 
@@ -460,7 +463,7 @@
 
         .feedback-textarea {
             width: 100%;
-            min-height: 80px;
+            min-height: 120px;
             padding: 12px;
             border: 1px solid #e0e0e0;
             border-radius: 6px;
@@ -468,6 +471,7 @@
             font-family: inherit;
             resize: vertical;
             margin-top: 8px;
+            overflow-y: hidden;
         }
 
         .feedback-textarea:focus {
@@ -827,7 +831,7 @@
                     </div>
 
                     <!-- Right Panel: Rubric -->
-                    <div class="grading-panel">
+                    <div class="grading-panel sticky">
                         <div class="panel-header">
                             <h3>Grading Rubric</h3>
                             <div class="panel-subheader">Score: <span id="total-score">Not Yet Scored</span></div>
@@ -906,6 +910,224 @@
             { firstName: 'Noah', lastName: 'Garcia', status: 'submitted', submittedDate: '2025-01-30', score: null },
             { firstName: 'Mia', lastName: 'Johnson', status: 'graded', submittedDate: '2025-01-28', score: 3 },
             { firstName: 'Liam', lastName: 'Lee', status: 'submitted', submittedDate: '2025-01-29', score: null }
+        ];
+
+        const studentSubmissions = {
+            0: { // Emma Thompson
+                behaviors: {
+                    selected: [0, 1, 2],
+                    ownWords: "I constantly check my phone for notifications even during conversations, which makes me less present. I also find myself thinking about posting on social media whenever something interesting happens, and I automatically reach for my phone whenever there's a quiet moment."
+                },
+                coreNeeds: {
+                    selected: [0, 1],
+                    reflection: "My phone habits are driven by wanting to stay connected with my friends and feeling like I need to respond quickly to messages. I also worry about missing out on social interactions online, and posting content makes me feel validated when people engage with it."
+                },
+                changes: [
+                    "Be more present during in-person conversations - Put my phone face-down or in my pocket when hanging out with friends and family, and resist checking notifications until the conversation is over.",
+                    "Reduce mindless scrolling - Set app time limits on social media (30 minutes per day) and use that time more intentionally instead of scrolling when bored.",
+                    "Create phone-free morning and evening routines - Don't check my phone for the first 30 minutes after waking up, and put it away 1 hour before bed to improve my sleep and start/end my day more mindfully."
+                ],
+                suggestedScore: 4,
+                aiFeedback: "Excellent work connecting your digital habits to your core needs for connection and acceptance. Your self-awareness is strong, especially in recognizing how notifications pull you away from in-person conversations.\n\nYour proposed changes are specific and realistic - the phone-free morning/evening routine and setting app time limits show thoughtful planning. Consider tracking your progress for one week and reflecting on what challenges you encounter.\n\nOne area to strengthen: You could explore alternative ways to meet your needs for connection and acceptance that don't rely on constant digital checking. What offline activities give you similar feelings?"
+            },
+            1: { // Marcus Chen
+                behaviors: {
+                    selected: [3, 4],
+                    ownWords: "I find it really hard to put my phone down once I start scrolling through TikTok or Instagram. Sometimes I look up and realize an hour has passed. I also get anxious when my phone battery is low because I feel disconnected from everything happening online."
+                },
+                coreNeeds: {
+                    selected: [2, 4],
+                    reflection: "I think I use my phone a lot because I'm curious about what's happening in the world and with people I follow. It's also really stimulating and entertaining, especially when I'm bored in class or at home. Regular life feels slow compared to the constant stream of content online."
+                },
+                changes: [
+                    "Delete social media apps from my phone on school nights - I can still use them on my computer, but making them less accessible will help me break the automatic scrolling habit.",
+                    "Find other ways to entertain myself - Pick up hobbies like drawing, basketball, or reading that give me the stimulation I'm looking for without screens."
+                ],
+                suggestedScore: 4,
+                aiFeedback: "Strong reflection on how curiosity and stimulation drive your phone habits. You've identified a clear pattern of time slipping away during scrolling sessions, which shows good self-awareness.\n\nYour strategy to delete apps on school nights is practical and shows you understand your triggers. Finding alternative hobbies is excellent - consider starting with just one activity this week.\n\nTo strengthen: Be more specific about when you'll do these alternative activities. Instead of 'when bored,' try 'right after school for 30 minutes' to build a consistent habit."
+            },
+            2: { // Sophia Rodriguez
+                behaviors: {
+                    selected: [0, 2, 3],
+                    ownWords: "I'm always checking my phone - when notifications come in, when I wake up, when I'm waiting in line. I know I spend way too much time on social media but it's really hard to stop once I start scrolling. It's become automatic."
+                },
+                coreNeeds: {
+                    selected: [0, 1, 4],
+                    reflection: "My digital habits are mostly about staying connected with friends and not missing out on what everyone's doing. I also feel more accepted when people like my posts or comment on my stories. And honestly, scrolling is just entertaining when there's nothing else to do - it's an easy way to fill time."
+                },
+                changes: [
+                    "Turn off all non-essential notifications - Only keep texts from family and close friends so I'm not constantly pulled to check my phone.",
+                    "Set a daily screen time goal of 2 hours for social media and check my progress each night.",
+                    "Leave my phone in another room when doing homework or spending time with family so I'm fully present and not tempted to check it constantly."
+                ],
+                suggestedScore: 5,
+                aiFeedback: "Outstanding work! You've demonstrated deep understanding of both the 'why' behind your digital habits and their impact on your life. Your connection of phone use to multiple core needs (connection, acceptance, stimulation) shows sophisticated self-awareness.\n\nYour three proposed changes are specific, actionable, and address different aspects of the problem. The notification strategy tackles interruptions, screen time goals add accountability, and physical separation ensures focus.\n\nYou've fully met both lesson objectives with clear explanations in your own words. Well done!"
+            },
+            3: { // Aiden Kumar
+                behaviors: {
+                    selected: [1, 2],
+                    ownWords: "Whenever something interesting happens, my first thought is about posting it. Like if I'm at a concert or trying a new restaurant, I'm thinking about what picture to take or what caption to write. I also check my phone constantly throughout the day, especially when I'm bored or waiting."
+                },
+                coreNeeds: {
+                    selected: [1, 2],
+                    reflection: "I want people to see the cool stuff I'm doing and think well of me. When I post something and people engage with it, I feel validated. I'm also just naturally curious about what's happening in everyone else's lives and what's trending."
+                },
+                changes: [
+                    "Try having one 'phone-free' experience per week - Go somewhere or do something without posting about it, just enjoy it in the moment.",
+                    "Limit checking social media to specific times - Maybe three times a day instead of constantly throughout the day."
+                ],
+                suggestedScore: 3,
+                aiFeedback: "Good start identifying how your digital habits relate to acceptance and curiosity. You've recognized the pattern of performing experiences for social media rather than just living them.\n\nYour changes show awareness, but they could be more specific. What does 'phone-free experience' mean exactly? Which three times of day will you check social media?\n\nTo improve: Add more detail about how these habits impact your life. Do they affect your relationships? Your ability to focus? Your mood? Dig deeper into the critique portion of the assignment."
+            },
+            4: { // Olivia Washington (in progress - incomplete)
+                behaviors: {
+                    selected: [2],
+                    ownWords: "I check my phone as soon as I wake up to see what I missed overnight."
+                },
+                coreNeeds: {
+                    selected: [0],
+                    reflection: "I want to stay connected with my friends."
+                },
+                changes: [
+                    "Try not to use my phone before school."
+                ],
+                suggestedScore: 2,
+                aiFeedback: "You've started to explore your digital habits, but this submission needs more development to meet the lesson objectives.\n\nWhat's missing:\n• More complete identification of your habits (you selected only 1-2 behaviors)\n• Deeper explanation in your own words about the 'why' behind these habits\n• Critical analysis of how these habits impact your daily life\n• More specific and actionable changes with clear reasoning\n\nPlease expand on each section. Think about: How do these habits affect your relationships, focus, or wellbeing? What specific strategies could you use to change them?"
+            },
+            5: { // Lucas Martinez
+                behaviors: {
+                    selected: [0, 3, 4],
+                    ownWords: "I have a really hard time controlling my phone use. Even when someone's talking to me, I'll check my phone if I get a notification. I spend way more time scrolling than I mean to, and I feel genuinely anxious when my battery gets low or if I forget my phone at home. It's like I'm addicted."
+                },
+                coreNeeds: {
+                    selected: [0, 3, 4],
+                    reflection: "I think I'm trying to stay connected with people, but also I want to feel in control of what's happening. When I don't have my phone, I feel like I'm missing something important. The constant entertainment and stimulation is also hard to resist - real life feels boring in comparison."
+                },
+                changes: [
+                    "Get a basic alarm clock and leave my phone charging in the kitchen overnight - This will stop me from scrolling before bed and first thing in the morning.",
+                    "Use the Screen Time feature to block social media apps after 9 PM on school nights.",
+                    "Practice being without my phone for short periods - Start with 1 hour, then build up to longer stretches so I get more comfortable with the feeling."
+                ],
+                suggestedScore: 5,
+                aiFeedback: "Excellent, thoughtful reflection! You've identified a problematic relationship with your phone and connected it clearly to multiple core needs. Using the word 'addicted' shows genuine self-awareness about the severity of the issue.\n\nYour proposed changes are comprehensive and progressive - starting with overnight separation, adding time blocks, and gradually building tolerance for phone-free periods. This shows strategic thinking about behavior change.\n\nYou've fully met both objectives with clear interpretation of the 'why' and strong critique of the impacts. The comparison of 'real life feels boring' is particularly insightful. Outstanding work!"
+            },
+            6: { // Isabella Anderson
+                behaviors: {
+                    selected: [1, 2, 3],
+                    ownWords: "I'm always thinking about content - what would make a good post or story. When I'm hanging out with friends, part of my brain is thinking about how to capture it. I also scroll a lot, probably more than I should, and I check my phone constantly out of habit."
+                },
+                coreNeeds: {
+                    selected: [1, 4],
+                    reflection: "Social media makes me feel accepted when people engage with my content. I put effort into my posts because I want people to think I'm interesting and have a cool life. The entertainment factor is also real - scrolling is just easy and always available."
+                },
+                changes: [
+                    "Have phone-free hangouts with friends - Put everyone's phones in a pile and just be present together.",
+                    "Reduce posting frequency - Instead of posting daily, try posting only when something genuinely meaningful happens.",
+                    "Replace morning scrolling with journaling - Write for 10 minutes instead of scrolling through feeds."
+                ],
+                suggestedScore: 4,
+                aiFeedback: "Strong work identifying how the desire for acceptance drives your content creation mindset. You've shown good awareness of how this affects your real-world experiences with friends.\n\nYour proposed changes are creative and address multiple aspects of the problem. The phone-free hangouts idea is especially good for breaking group habits. Journaling as a replacement activity shows you're thinking about alternatives.\n\nOne area to develop: How exactly do these habits impact your life? You mention them but could dig deeper into the consequences - do they affect your relationships, mental health, or ability to enjoy moments?"
+            },
+            7: { // Ethan Brown
+                behaviors: {
+                    selected: [2, 3],
+                    ownWords: "I check my phone all the time - when I wake up, when I'm bored, when I'm waiting for anything. I also spend way too long on YouTube and gaming apps, and it's hard to stop once I start."
+                },
+                coreNeeds: {
+                    selected: [2, 4],
+                    reflection: "I'm curious about what's new and what's happening online. Videos and games are also just way more stimulating and fun than homework or chores. It's an easy escape."
+                },
+                changes: [
+                    "Set app timers for YouTube and games - Limit to 1 hour total per day.",
+                    "Put my phone across the room when doing homework so I'm not tempted to check it."
+                ],
+                suggestedScore: 3,
+                aiFeedback: "Good identification of your habits around seeking stimulation and curiosity through digital content. You recognize the 'escape' aspect, which is an important insight.\n\nYour proposed changes are practical starting points. App timers and physical distance are both proven strategies.\n\nTo strengthen your work: Explain more about the 'why' behind choosing these specific changes. How do your current habits negatively impact your life? What do you hope will be different after making these changes? Add more critical analysis of the consequences."
+            },
+            8: { // Ava Davis
+                behaviors: {
+                    selected: [0, 1, 2, 3],
+                    ownWords: "I'm constantly on my phone. I interrupt conversations to check notifications, I think about posting whenever I'm doing something, I check it when I wake up and whenever I'm bored, and I definitely scroll way more than I should. It's become automatic and I don't always realize I'm doing it."
+                },
+                coreNeeds: {
+                    selected: [0, 1, 2, 4],
+                    reflection: "All of these core needs connect to my phone use. I want connection with friends, I want to feel accepted through likes and comments, I'm curious about what everyone's doing, and scrolling is stimulating and entertaining. My phone meets all these needs at once, which is why it's so hard to put down."
+                },
+                changes: [
+                    "Turn off all notifications except calls and texts from family - This will stop the constant interruptions.",
+                    "Delete Instagram and TikTok from my phone for one month - If I really want to check them, I can use my laptop, but this creates friction that will help me break the habit.",
+                    "Find offline ways to meet my needs - Join an after-school club for connection, start a creative hobby for stimulation, read news instead of scrolling for curiosity.",
+                    "Track my progress - Keep a daily journal noting when I'm tempted to use my phone and how I feel without it."
+                ],
+                suggestedScore: 5,
+                aiFeedback: "Exceptional work! You've demonstrated sophisticated understanding of your digital habits and their underlying motivations. Recognizing that your phone meets multiple core needs simultaneously explains why changing behavior is so challenging.\n\nYour four proposed changes are comprehensive, strategic, and show deep thinking. You're not just reducing phone use, but actively replacing it with offline alternatives that meet the same needs. The tracking component adds accountability and reflection.\n\nYou've exceeded both lesson objectives with thorough interpretation and critique. Your insight that 'it's become automatic and I don't always realize I'm doing it' shows excellent self-awareness. Outstanding!"
+            },
+            9: { // Noah Garcia
+                behaviors: {
+                    selected: [2, 4],
+                    ownWords: "I check my phone constantly throughout the day, and I feel uncomfortable when my phone isn't with me or the battery is dying. It's like I need to know it's there even if I'm not actively using it."
+                },
+                coreNeeds: {
+                    selected: [0, 3],
+                    reflection: "I think it's about staying connected and feeling in control. If I don't have my phone, I feel like I'm out of the loop and can't respond if someone needs me. It gives me a sense of control over my social life."
+                },
+                changes: [
+                    "Practice leaving my phone at home for short trips - Start with quick errands to build comfort with being disconnected.",
+                    "Turn off read receipts and 'last seen' on messaging apps - This will reduce the pressure to respond immediately."
+                ],
+                suggestedScore: 4,
+                aiFeedback: "Strong reflection on how your phone use connects to control and connection needs. You've identified the anxiety aspect, which is an important psychological insight about modern phone dependency.\n\nYour proposed changes directly address the root issue - the discomfort with being disconnected. Starting small with short trips and reducing social pressure through app settings shows strategic thinking.\n\nTo enhance: Add one more change that addresses the constant checking behavior throughout the day. Also, elaborate more on how these habits impact your daily life - relationships, focus, stress levels, etc."
+            },
+            10: { // Mia Johnson
+                behaviors: {
+                    selected: [1, 2],
+                    ownWords: "I think about posting stuff on social media and I check my phone when I'm bored."
+                },
+                coreNeeds: {
+                    selected: [1],
+                    reflection: "I guess I want to feel accepted by my friends online."
+                },
+                changes: [
+                    "Use my phone less.",
+                    "Maybe post less on social media."
+                ],
+                suggestedScore: 2,
+                aiFeedback: "You've identified some basic patterns, but this submission needs significant development to meet the lesson objectives.\n\nWhat's needed:\n• Deeper explanation in your own words about WHY you have these habits - go beyond surface-level observations\n• Critical analysis of HOW these habits impact your life - be specific about consequences\n• More detailed and actionable changes - 'use phone less' is too vague. What specifically will you do? When? How?\n\nTry to write at least 2-3 sentences for each section. Think critically about your relationship with technology and be honest about its effects on your wellbeing, relationships, and focus."
+            },
+            11: { // Liam Lee
+                behaviors: {
+                    selected: [0, 1, 3, 4],
+                    ownWords: "My phone completely controls my attention. I'll check it even when someone's talking to me. When I'm out with friends, I'm thinking about how to post about it. I scroll for hours and have trouble stopping. And I get genuinely anxious and uncomfortable when my phone isn't nearby - it's always in my hand or pocket."
+                },
+                coreNeeds: {
+                    selected: [0, 1, 3, 4],
+                    reflection: "Looking at all these core needs, I realize my phone has become my main source for all of them. I use it to feel connected to friends, to feel accepted through social validation, to satisfy my curiosity about everything, and for constant entertainment. The problem is I'm not actually meeting these needs in healthy ways - I'm just getting quick hits of satisfaction that fade quickly and leave me wanting more."
+                },
+                changes: [
+                    "Digital sunset at 8 PM every day - Phone goes on the charger in the kitchen and I don't touch it until after breakfast the next morning. This gives me 12+ hours of separation daily.",
+                    "Unfollow accounts that make me feel bad about myself - Focus my feed on educational content and close friends only, removing the comparison and validation-seeking.",
+                    "Build real-world connections - Instead of texting, call friends or hang out in person. Replace scrolling time with face-to-face interaction.",
+                    "Start a 30-day challenge with accountability - Track my screen time daily and share progress with my family so I have external support for making changes."
+                ],
+                suggestedScore: 5,
+                aiFeedback: "Outstanding reflection showing exceptional depth and self-awareness. Your insight that you're 'getting quick hits of satisfaction that fade quickly' demonstrates sophisticated understanding of how digital habits create unsatisfying cycles.\n\nYour four proposed changes are comprehensive and well-reasoned. The digital sunset addresses multiple problems at once, unfollowing toxic accounts shows you're thinking about quality of use (not just quantity), building real-world connections tackles root needs, and accountability mechanisms increase your chances of success.\n\nYou've exceeded both lesson objectives. This is exactly the kind of critical thinking and honest self-reflection we're looking for. Excellent work!"
+            }
+        };
+
+        const allBehaviors = [
+            "I look at my phone or other digital devices when I get a notification, even when I'm talking to someone else in person.",
+            "When I go out somewhere, hang out with someone, or am making something, I think about how I might post about it.",
+            "I check my phone as soon as I wake up, whenever I'm waiting for something, or when I'm bored.",
+            "I spend more time than I'd like to scrolling through social media or other apps, and I have a hard time controlling it.",
+            "I feel anxious when I don't have my phone with me or when the battery is low."
+        ];
+
+        const allCoreNeeds = [
+            "Connection: \"I want to feel connection with others.\"",
+            "Acceptance: \"I want to feel accepted.\"",
+            "Curiosity: \"I want to explore and learn.\"",
+            "Control: \"I want to feel in control.\"",
+            "Stimulation: \"I want to feel entertained or excited.\""
         ];
 
         const scoreDescriptions = {
@@ -1040,7 +1262,12 @@
         function selectStudent(index) {
             currentStudentIndex = index;
             const student = students[index];
+            const submission = studentSubmissions[index];
+
             document.getElementById('grading-student-name').textContent = `Grading: ${student.firstName} ${student.lastName}`;
+
+            // Update student work content
+            updateStudentWork(submission);
 
             // Reset submission state
             isSubmitted = false;
@@ -1054,8 +1281,8 @@
             });
             document.getElementById('score-description').style.display = 'none';
 
-            // Pre-select AI-suggested score (4 points for this example)
-            const suggestedScore = 4;
+            // Pre-select AI-suggested score
+            const suggestedScore = submission.suggestedScore;
             const suggestedOption = document.querySelector(`.point-option[data-points="${suggestedScore}"]`);
             if (suggestedOption) {
                 suggestedOption.classList.add('selected', 'ai-suggested');
@@ -1071,10 +1298,82 @@
 
             // Pre-populate AI-generated feedback
             const feedbackTextarea = document.getElementById('feedback-textarea');
-            feedbackTextarea.value = `Excellent work connecting your digital habits to your core needs for connection and acceptance. Your self-awareness is strong, especially in recognizing how notifications pull you away from in-person conversations.\n\nYour proposed changes are specific and realistic - the phone-free morning/evening routine and setting app time limits show thoughtful planning. Consider tracking your progress for one week and reflecting on what challenges you encounter.\n\nOne area to strengthen: You could explore alternative ways to meet your needs for connection and acceptance that don't rely on constant digital checking. What offline activities give you similar feelings?`;
+            feedbackTextarea.value = submission.aiFeedback;
+            autoResizeTextarea(feedbackTextarea);
 
             updateScore();
             goToPage('page-grading');
+        }
+
+        function updateStudentWork(submission) {
+            // Generate behaviors HTML
+            const selectedBehaviors = submission.behaviors.selected.map(i =>
+                `✓ ${allBehaviors[i]}`
+            ).join('<br>');
+
+            const unselectedBehaviors = allBehaviors
+                .map((b, i) => submission.behaviors.selected.includes(i) ? null : `○ ${b}`)
+                .filter(b => b !== null)
+                .join('<br>');
+
+            // Generate core needs HTML
+            const selectedNeeds = submission.coreNeeds.selected.map(i =>
+                `✓ ${allCoreNeeds[i]}`
+            ).join('<br>');
+
+            const unselectedNeeds = allCoreNeeds
+                .map((n, i) => submission.coreNeeds.selected.includes(i) ? null : `○ ${n}`)
+                .filter(n => n !== null)
+                .join('<br>');
+
+            // Generate changes HTML
+            const changesHTML = submission.changes.map((change, i) =>
+                `${i + 1}. ${change}`
+            ).join('<br><br>');
+
+            // Update the DOM
+            document.querySelector('.panel-content').innerHTML = `
+                <div class="question-block">
+                    <div class="question-label">Section 1: Digital Behaviors</div>
+                    <div class="question-text">Reflect on the digital habit statements below. Mark one or two that feel most true for you, then write them in your own words.</div>
+                    <div class="student-response">
+                        <strong>Student's selections:</strong><br>
+                        ${selectedBehaviors}<br><br>
+
+                        ${unselectedBehaviors ? `<strong>Not selected:</strong><br>${unselectedBehaviors}<br><br>` : ''}
+
+                        <strong>In their own words:</strong><br>
+                        "${submission.behaviors.ownWords}"
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">Section 2: Core Needs</div>
+                    <div class="question-text">Which of these core needs feels most connected to your habit? Mark one or two.</div>
+                    <div class="student-response">
+                        <strong>Student's selections:</strong><br>
+                        ${selectedNeeds}<br><br>
+
+                        ${unselectedNeeds ? `<strong>Not selected:</strong><br>${unselectedNeeds}<br><br>` : ''}
+
+                        <strong>Their reflection:</strong><br>
+                        "${submission.coreNeeds.reflection}"
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-label">Section 3: Future Changes</div>
+                    <div class="question-text">Write down 1-3 digital habits you want to try to change in the future.</div>
+                    <div class="student-response">
+                        ${changesHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
         }
 
         function selectPoints(element) {
@@ -1175,6 +1474,14 @@
         // Initialize - sort by last name on page load
         document.addEventListener('DOMContentLoaded', function() {
             renderStudentTable();
+
+            // Add auto-resize to feedback textarea
+            const feedbackTextarea = document.getElementById('feedback-textarea');
+            if (feedbackTextarea) {
+                feedbackTextarea.addEventListener('input', function() {
+                    autoResizeTextarea(this);
+                });
+            }
         });
     </script>
 </body>
