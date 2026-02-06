@@ -528,6 +528,7 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 14px;
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         .btn-secondary:hover {
@@ -543,6 +544,7 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 14px;
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         .btn-primary:hover {
@@ -572,6 +574,7 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         .nav-btn:hover {
@@ -681,11 +684,12 @@
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
-            margin-left: auto;
+            margin-left: 12px;
         }
 
         .ai-suggested-badge.show {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
         }
 
         .rubric-criterion-header {
@@ -1803,12 +1807,14 @@
         function previousStudent() {
             if (currentStudentIndex > 0) {
                 selectStudent(currentStudentIndex - 1);
+                window.scrollTo(0, 0);
             }
         }
 
         function nextStudent() {
             if (currentStudentIndex < students.length - 1) {
                 selectStudent(currentStudentIndex + 1);
+                window.scrollTo(0, 0);
             }
         }
 
