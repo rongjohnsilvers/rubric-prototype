@@ -926,7 +926,7 @@
                         <div>18/20 students</div>
                         <div>January 30, 2025</div>
                         <div>
-                            <button class="review-btn" onclick="goToPage('page-students')">Review Responses</button>
+                            <button class="review-btn" data-action="go-to-page" data-page="page-students">Review Responses</button>
                         </div>
                         <div class="menu-btn">⋮</div>
                     </div>
@@ -935,7 +935,7 @@
 
             <!-- Page 2: Student List -->
             <div id="page-students" class="page">
-                <a href="#" class="back-link" onclick="goToPage('page-assignments'); return false;">← Back to Assignments</a>
+                <a href="#" class="back-link" data-action="go-to-page" data-page="page-assignments">← Back to Assignments</a>
                 <h1>9.1.3. Our Digital Habits</h1>
 
                 <div id="success-message" class="success-message">
@@ -949,19 +949,19 @@
                     </div>
 
                     <div class="table-header student-table-header">
-                        <div class="sortable" onclick="sortTable('lastName')">
+                        <div class="sortable" data-action="sort" data-column="lastName">
                             Last Name <span class="sort-indicator">▼</span>
                         </div>
-                        <div class="sortable" onclick="sortTable('firstName')">
+                        <div class="sortable" data-action="sort" data-column="firstName">
                             First Name <span class="sort-indicator"></span>
                         </div>
-                        <div class="sortable hide-mobile" onclick="sortTable('submittedDate')">
+                        <div class="sortable hide-mobile" data-action="sort" data-column="submittedDate">
                             Submitted <span class="sort-indicator"></span>
                         </div>
-                        <div class="sortable hide-tablet" onclick="sortTable('status')">
+                        <div class="sortable hide-tablet" data-action="sort" data-column="status">
                             Status <span class="sort-indicator"></span>
                         </div>
-                        <div class="sortable hide-tablet" onclick="sortTable('score')">
+                        <div class="sortable hide-tablet" data-action="sort" data-column="score">
                             Score <span class="sort-indicator"></span>
                         </div>
                         <div class="actions-header">Actions</div>
@@ -975,7 +975,7 @@
 
             <!-- Page 3: Grading Interface -->
             <div id="page-grading" class="page">
-                <a href="#" class="back-link" onclick="goToPage('page-students'); return false;">← Back to Student List</a>
+                <a href="#" class="back-link" data-action="go-to-page" data-page="page-students">← Back to Student List</a>
                 <h1 id="grading-student-name">Grading: Emma Thompson</h1>
 
                 <div class="grading-layout">
@@ -1052,12 +1052,12 @@
 
                                 <div class="rubric-criterion">Select Score</div>
                                 <div class="rubric-points">
-                                    <div class="point-option" data-points="5" onclick="selectPoints(this)">5 - Excellent</div>
-                                    <div class="point-option" data-points="4" onclick="selectPoints(this)">4 - Good</div>
-                                    <div class="point-option" data-points="3" onclick="selectPoints(this)">3 - Satisfactory</div>
-                                    <div class="point-option" data-points="2" onclick="selectPoints(this)">2 - Limited</div>
-                                    <div class="point-option" data-points="1" onclick="selectPoints(this)">1 - Insufficient</div>
-                                    <div class="point-option" data-points="0" onclick="selectPoints(this)">0 - No Evidence</div>
+                                    <div class="point-option" data-points="5" data-action="select-points">5 - Excellent</div>
+                                    <div class="point-option" data-points="4" data-action="select-points">4 - Good</div>
+                                    <div class="point-option" data-points="3" data-action="select-points">3 - Satisfactory</div>
+                                    <div class="point-option" data-points="2" data-action="select-points">2 - Limited</div>
+                                    <div class="point-option" data-points="1" data-action="select-points">1 - Insufficient</div>
+                                    <div class="point-option" data-points="0" data-action="select-points">0 - No Evidence</div>
                                 </div>
 
                                 <div id="score-description" style="background-color: #f0f7ff; padding: 16px; border-radius: 6px; margin-top: 16px; font-size: 13px; line-height: 1.6; display: none;">
@@ -1097,12 +1097,12 @@
                                 <span class="submitted-message" id="submitted-message">✓ Submitted successfully</span>
                             </div>
                             <div class="action-buttons">
-                                <button class="btn-secondary" id="save-exit-btn" onclick="saveProgress()">Save & Exit</button>
+                                <button class="btn-secondary" id="save-exit-btn" data-action="save-progress">Save & Exit</button>
                                 <div class="student-nav">
-                                    <button class="nav-btn" onclick="previousStudent()">← Previous</button>
-                                    <button class="nav-btn" onclick="nextStudent()">Next →</button>
+                                    <button class="nav-btn" id="prev-student-btn" data-action="previous-student">← Previous</button>
+                                    <button class="nav-btn" id="next-student-btn" data-action="next-student">Next →</button>
                                 </div>
-                                <button class="btn-primary" id="submit-btn" onclick="submitRubric()">Submit Grade</button>
+                                <button class="btn-primary" id="submit-btn" data-action="submit-rubric">Submit Grade</button>
                             </div>
                         </div>
                     </div>
@@ -1473,8 +1473,8 @@
 
             const headers = document.querySelectorAll('.sortable');
             headers.forEach(header => {
-                const onclick = header.getAttribute('onclick');
-                if (onclick && onclick.includes(currentSort.column)) {
+                const column = header.getAttribute('data-column');
+                if (column === currentSort.column) {
                     const indicator = header.querySelector('.sort-indicator');
                     indicator.textContent = currentSort.ascending ? '▼' : '▲';
                     indicator.classList.add('active');
@@ -1490,19 +1490,16 @@
                 const statusText = student.status === 'graded' ? 'Graded' :
                                   student.status === 'inprogress' ? 'In Progress' : 'Submitted';
 
-                let buttonClass, buttonText, buttonOnclick;
+                let buttonClass, buttonText;
                 if (student.status === 'graded') {
                     buttonClass = 'view-btn';
                     buttonText = 'View';
-                    buttonOnclick = `selectStudent(${originalIndex})`;
                 } else if (student.status === 'inprogress') {
                     buttonClass = 'remind-btn';
                     buttonText = 'Remind';
-                    buttonOnclick = `remindStudent(${originalIndex})`;
                 } else {
                     buttonClass = 'grade-btn';
                     buttonText = 'Grade';
-                    buttonOnclick = `selectStudent(${originalIndex})`;
                 }
 
                 const submittedText = student.submittedDate ?
@@ -1525,13 +1522,13 @@
                 }
 
                 return `
-                    <div class="student-item" onclick="${student.status === 'inprogress' ? '' : `selectStudent(${originalIndex})`}">
+                    <div class="student-item" ${student.status === 'inprogress' ? '' : `data-action="select-student" data-index="${originalIndex}"`}>
                         <div class="student-name">${student.lastName}</div>
                         <div class="student-name">${student.firstName}</div>
                         <div class="hide-mobile">${submittedText}</div>
                         <div class="hide-tablet"><span class="status-badge ${statusClass}">${statusText}</span></div>
                         <div class="hide-tablet">${scoreDisplay}</div>
-                        <div><button class="${buttonClass}" onclick="event.stopPropagation(); ${buttonOnclick};">${buttonText}</button></div>
+                        <div><button class="${buttonClass}" data-action="${student.status === 'inprogress' ? 'remind-student' : 'select-student'}" data-index="${originalIndex}">${buttonText}</button></div>
                     </div>
                 `;
             }).join('');
@@ -1595,7 +1592,6 @@
 
             // Handle graded vs non-graded students
             const feedbackTextarea = document.getElementById('feedback-textarea');
-            const submitBtn = document.getElementById('submit-btn');
 
             if (student.status === 'graded') {
                 // Update UI to show submitted state for all graded students
@@ -1819,21 +1815,21 @@
 
                 // Combine default and custom snippets
                 const defaultSnippets = feedbackSnippets[category].map((snippet, index) =>
-                    `<div class="snippet-chip" onclick="toggleSnippetSelection(this)">
+                    `<div class="snippet-chip" data-action="toggle-snippet">
                         ${snippet}
-                        <span class="snippet-chip-remove" onclick="event.stopPropagation(); removeSnippet('${category}', ${index}, false)">×</span>
+                        <span class="snippet-chip-remove" data-action="remove-snippet" data-category="${category}" data-snippet-index="${index}" data-custom="false">×</span>
                     </div>`
                 );
 
                 const customSnippetElements = customSnippets[category].map((snippet, index) =>
-                    `<div class="snippet-chip" onclick="toggleSnippetSelection(this)">
+                    `<div class="snippet-chip" data-action="toggle-snippet">
                         ${snippet}
-                        <span class="snippet-chip-remove" onclick="event.stopPropagation(); removeSnippet('${category}', ${index}, true)">×</span>
+                        <span class="snippet-chip-remove" data-action="remove-snippet" data-category="${category}" data-snippet-index="${index}" data-custom="true">×</span>
                     </div>`
                 );
 
-                const addButton = `<div class="snippet-chip snippet-chip-add" onclick="addCustomSnippet('${category}')">+ Add</div>`;
-                const input = `<input type="text" id="snippet-input-${category}" class="snippet-input" placeholder="Type and click + Add again to save" onblur="setTimeout(() => { if(document.activeElement.id !== 'snippet-input-${category}') this.classList.remove('show'); }, 200)" onkeypress="if(event.key === 'Enter') addCustomSnippet('${category}')">`;
+                const addButton = `<div class="snippet-chip snippet-chip-add" data-action="add-snippet" data-category="${category}">+ Add</div>`;
+                const input = `<input type="text" id="snippet-input-${category}" class="snippet-input" placeholder="Type and click + Add again to save" data-category="${category}">`;
 
                 container.innerHTML = [...defaultSnippets, ...customSnippetElements, addButton].join('') + input;
             });
@@ -1990,6 +1986,99 @@
                     autoResizeTextarea(this);
                 });
             }
+
+            // Event delegation for all interactive elements
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                const actionEl = target.closest('[data-action]');
+                if (!actionEl) return;
+
+                const action = actionEl.getAttribute('data-action');
+
+                switch (action) {
+                    case 'go-to-page': {
+                        e.preventDefault();
+                        const pageId = actionEl.getAttribute('data-page');
+                        goToPage(pageId);
+                        break;
+                    }
+                    case 'sort': {
+                        const column = actionEl.getAttribute('data-column');
+                        sortTable(column);
+                        break;
+                    }
+                    case 'select-points': {
+                        selectPoints(actionEl);
+                        break;
+                    }
+                    case 'select-student': {
+                        const index = parseInt(actionEl.getAttribute('data-index'));
+                        selectStudent(index);
+                        break;
+                    }
+                    case 'remind-student': {
+                        e.stopPropagation();
+                        const index = parseInt(actionEl.getAttribute('data-index'));
+                        remindStudent(index);
+                        break;
+                    }
+                    case 'save-progress': {
+                        saveProgress();
+                        break;
+                    }
+                    case 'previous-student': {
+                        previousStudent();
+                        break;
+                    }
+                    case 'next-student': {
+                        nextStudent();
+                        break;
+                    }
+                    case 'submit-rubric': {
+                        submitRubric();
+                        break;
+                    }
+                    case 'toggle-snippet': {
+                        // Only toggle if the click wasn't on the remove button
+                        if (!target.closest('[data-action="remove-snippet"]')) {
+                            toggleSnippetSelection(actionEl);
+                        }
+                        break;
+                    }
+                    case 'remove-snippet': {
+                        e.stopPropagation();
+                        const category = actionEl.getAttribute('data-category');
+                        const snippetIndex = parseInt(actionEl.getAttribute('data-snippet-index'));
+                        const isCustom = actionEl.getAttribute('data-custom') === 'true';
+                        removeSnippet(category, snippetIndex, isCustom);
+                        break;
+                    }
+                    case 'add-snippet': {
+                        const category = actionEl.getAttribute('data-category');
+                        addCustomSnippet(category);
+                        break;
+                    }
+                }
+            });
+
+            // Event delegation for snippet input keypress and blur
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && e.target.classList.contains('snippet-input')) {
+                    const category = e.target.getAttribute('data-category');
+                    addCustomSnippet(category);
+                }
+            });
+
+            document.addEventListener('blur', function(e) {
+                if (e.target.classList.contains('snippet-input')) {
+                    const input = e.target;
+                    setTimeout(() => {
+                        if (document.activeElement.id !== input.id) {
+                            input.classList.remove('show');
+                        }
+                    }, 200);
+                }
+            }, true);
         });
     </script>
 </body>
