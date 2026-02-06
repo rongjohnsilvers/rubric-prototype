@@ -687,9 +687,13 @@
 
         .point-option .ai-badge {
             display: inline-block;
-            font-size: 10px;
-            opacity: 0.8;
+            font-size: 9px;
             margin-left: 6px;
+            background-color: rgba(156, 39, 176, 0.15);
+            color: #7b1fa2;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
         }
 
         .submitted-message {
@@ -753,13 +757,11 @@
         }
 
         .feedback-snippets h5 {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
-            color: #666;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
 
         .snippet-category {
@@ -1516,7 +1518,7 @@
 
                 // Add AI badge to button
                 const originalText = suggestedOption.textContent;
-                suggestedOption.innerHTML = `${originalText}<span class="ai-badge">✨ AI</span>`;
+                suggestedOption.innerHTML = `${originalText}<span class="ai-badge">✨ AI suggested</span>`;
 
                 // Show score description
                 const descBox = document.getElementById('score-description');
