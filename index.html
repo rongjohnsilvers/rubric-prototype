@@ -1593,58 +1593,59 @@
             // Render feedback snippets first
             renderFeedbackSnippets();
 
-            // Restore feedback and selected snippets if student has been graded
+            // Handle graded vs non-graded students
             const feedbackTextarea = document.getElementById('feedback-textarea');
-            if (student.status === 'graded' && student.selectedSnippets) {
-                // Restore selected snippets
-                const snippets = student.selectedSnippets;
+            const submitBtn = document.getElementById('submit-btn');
 
-                // Restore strengths
-                snippets.strengths.forEach(text => {
-                    const chips = document.querySelectorAll('#snippets-strengths .snippet-chip');
-                    chips.forEach(chip => {
-                        const chipText = chip.childNodes[0].textContent.trim();
-                        if (chipText === text) {
-                            chip.classList.add('selected');
-                        }
-                    });
-                });
+            if (student.status === 'graded') {
+                // Update UI to show submitted state for all graded students
+                isSubmitted = true;
+                document.getElementById('submitted-message').classList.add('show');
+                submitBtn.textContent = 'Resubmit';
+                submitBtn.classList.add('resubmit');
+                currentScore = student.score;
 
-                // Restore improvements
-                snippets.improvements.forEach(text => {
-                    const chips = document.querySelectorAll('#snippets-improvements .snippet-chip');
-                    chips.forEach(chip => {
-                        const chipText = chip.childNodes[0].textContent.trim();
-                        if (chipText === text) {
-                            chip.classList.add('selected');
-                        }
-                    });
-                });
+                // Restore feedback and selected snippets if they exist
+                if (student.selectedSnippets) {
+                    const snippets = student.selectedSnippets;
 
-                // Restore suggestions
-                snippets.suggestions.forEach(text => {
-                    const chips = document.querySelectorAll('#snippets-suggestions .snippet-chip');
-                    chips.forEach(chip => {
-                        const chipText = chip.childNodes[0].textContent.trim();
-                        if (chipText === text) {
-                            chip.classList.add('selected');
-                        }
+                    // Restore strengths
+                    snippets.strengths.forEach(text => {
+                        const chips = document.querySelectorAll('#snippets-strengths .snippet-chip');
+                        chips.forEach(chip => {
+                            const chipText = chip.childNodes[0].textContent.trim();
+                            if (chipText === text) {
+                                chip.classList.add('selected');
+                            }
+                        });
                     });
-                });
+
+                    // Restore improvements
+                    snippets.improvements.forEach(text => {
+                        const chips = document.querySelectorAll('#snippets-improvements .snippet-chip');
+                        chips.forEach(chip => {
+                            const chipText = chip.childNodes[0].textContent.trim();
+                            if (chipText === text) {
+                                chip.classList.add('selected');
+                            }
+                        });
+                    });
+
+                    // Restore suggestions
+                    snippets.suggestions.forEach(text => {
+                        const chips = document.querySelectorAll('#snippets-suggestions .snippet-chip');
+                        chips.forEach(chip => {
+                            const chipText = chip.childNodes[0].textContent.trim();
+                            if (chipText === text) {
+                                chip.classList.add('selected');
+                            }
+                        });
+                    });
+                }
 
                 // Restore feedback text
                 feedbackTextarea.value = student.feedback || '';
                 autoResizeTextarea(feedbackTextarea);
-
-                // Update UI to show submitted state
-                isSubmitted = true;
-                document.getElementById('submitted-message').classList.add('show');
-                const submitBtn = document.getElementById('submit-btn');
-                submitBtn.textContent = 'Resubmit';
-                submitBtn.classList.add('resubmit');
-
-                // Update score display
-                currentScore = student.score;
             } else {
                 // Clear feedback textarea for new grading
                 feedbackTextarea.value = '';
