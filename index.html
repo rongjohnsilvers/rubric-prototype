@@ -675,29 +675,14 @@
             white-space: normal;
             line-height: 1.3;
             padding: 10px 14px;
+            position: relative;
         }
 
-        .ai-suggested-badge {
-            display: none;
-            background-color: #f3e5f5;
-            color: #9c27b0;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-left: 12px;
-            line-height: 1;
-        }
-
-        .ai-suggested-badge.show {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .rubric-criterion-header {
-            display: flex;
-            align-items: center;
-            margin-top: 20px;
+        .point-option .ai-badge {
+            display: inline-block;
+            font-size: 10px;
+            opacity: 0.8;
+            margin-left: 6px;
         }
 
         .submitted-message {
@@ -1019,10 +1004,7 @@
                                     • Students will be able to <strong>critique how their digital habits impact their lives</strong>
                                 </div>
 
-                                <div class="rubric-criterion-header">
-                                    <div class="rubric-criterion">Select Score</div>
-                                    <span class="ai-suggested-badge" id="ai-suggested-badge">✨ AI Suggested</span>
-                                </div>
+                                <div class="rubric-criterion">Select Score</div>
                                 <div class="rubric-points">
                                     <div class="point-option" data-points="5" onclick="selectPoints(this)">5 - Excellent</div>
                                     <div class="point-option" data-points="4" onclick="selectPoints(this)">4 - Good</div>
@@ -1508,9 +1490,13 @@
             currentScore = null;
             document.querySelectorAll('.point-option').forEach(opt => {
                 opt.classList.remove('selected', 'ai-suggested');
+                // Remove AI badge if it exists
+                const badge = opt.querySelector('.ai-badge');
+                if (badge) {
+                    badge.remove();
+                }
             });
             document.getElementById('score-description').style.display = 'none';
-            document.getElementById('ai-suggested-badge').classList.remove('show');
 
             // Pre-select AI-suggested score
             const suggestedScore = submission.suggestedScore;
@@ -1519,8 +1505,9 @@
                 suggestedOption.classList.add('selected', 'ai-suggested');
                 currentScore = suggestedScore;
 
-                // Show AI suggested badge
-                document.getElementById('ai-suggested-badge').classList.add('show');
+                // Add AI badge to button
+                const originalText = suggestedOption.textContent;
+                suggestedOption.innerHTML = `${originalText}<span class="ai-badge">✨ AI</span>`;
 
                 // Show score description
                 const descBox = document.getElementById('score-description');
@@ -1732,10 +1719,12 @@
             const siblings = element.parentElement.querySelectorAll('.point-option');
             siblings.forEach(sib => {
                 sib.classList.remove('selected', 'ai-suggested');
+                // Remove AI badge if it exists
+                const badge = sib.querySelector('.ai-badge');
+                if (badge) {
+                    badge.remove();
+                }
             });
-
-            // Hide AI suggested badge when user manually selects
-            document.getElementById('ai-suggested-badge').classList.remove('show');
 
             // Add selection to clicked element (without AI indicator)
             element.classList.add('selected');
@@ -1793,21 +1782,24 @@
             // Remove AI suggested indicator after submission
             document.querySelectorAll('.point-option').forEach(opt => {
                 opt.classList.remove('ai-suggested');
+                const badge = opt.querySelector('.ai-badge');
+                if (badge) {
+                    badge.remove();
+                }
             });
-            document.getElementById('ai-suggested-badge').classList.remove('show');
         }
 
         function previousStudent() {
             if (currentStudentIndex > 0) {
                 selectStudent(currentStudentIndex - 1);
-                window.scrollTo(0, 0);
+                window.scrollTo({ top: 0, behavior: 'instant' });
             }
         }
 
         function nextStudent() {
             if (currentStudentIndex < students.length - 1) {
                 selectStudent(currentStudentIndex + 1);
-                window.scrollTo(0, 0);
+                window.scrollTo({ top: 0, behavior: 'instant' });
             }
         }
 
