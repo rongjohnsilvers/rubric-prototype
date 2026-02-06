@@ -549,6 +549,16 @@
             background-color: #45a049;
         }
 
+        .btn-primary.resubmit {
+            background-color: #fff;
+            color: #4caf50;
+            border: 2px solid #4caf50;
+        }
+
+        .btn-primary.resubmit:hover {
+            background-color: #f1f8f4;
+        }
+
         .student-nav {
             display: flex;
             gap: 8px;
@@ -587,8 +597,6 @@
 
         .overall-feedback {
             margin-top: 24px;
-            padding-top: 24px;
-            border-top: 2px solid #e0e0e0;
         }
 
         .overall-feedback h4 {
@@ -654,7 +662,6 @@
             flex-wrap: wrap;
             gap: 8px;
             margin-bottom: 12px;
-            margin-top: 32px;
         }
 
         .point-option {
@@ -666,21 +673,26 @@
             padding: 10px 14px;
         }
 
-        .ai-suggested {
-            position: relative;
+        .ai-suggested-badge {
+            display: none;
+            background-color: #f3e5f5;
+            color: #9c27b0;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
         }
 
-        .ai-suggested::before {
-            content: '✨ AI Suggested';
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 11px;
-            color: #9c27b0;
-            font-weight: 600;
-            white-space: nowrap;
-            margin-bottom: 6px;
+        .ai-suggested-badge.show {
+            display: inline-block;
+        }
+
+        .rubric-criterion-header {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
         }
 
         .submitted-message {
@@ -962,7 +974,10 @@
                                     • Students will be able to <strong>critique how their digital habits impact their lives</strong>
                                 </div>
 
-                                <div class="rubric-criterion" style="margin-top: 20px;">Select Score</div>
+                                <div class="rubric-criterion-header">
+                                    <div class="rubric-criterion">Select Score</div>
+                                    <span class="ai-suggested-badge" id="ai-suggested-badge">✨ AI Suggested</span>
+                                </div>
                                 <div class="rubric-points">
                                     <div class="point-option" data-points="5" onclick="selectPoints(this)">5 - Excellent</div>
                                     <div class="point-option" data-points="4" onclick="selectPoints(this)">4 - Good</div>
@@ -1436,7 +1451,9 @@
             // Reset submission state
             isSubmitted = false;
             document.getElementById('submitted-message').classList.remove('show');
-            document.getElementById('submit-btn').textContent = 'Submit Grade';
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.textContent = 'Submit Grade';
+            submitBtn.classList.remove('resubmit');
 
             // Reset rubric
             currentScore = null;
@@ -1444,6 +1461,7 @@
                 opt.classList.remove('selected', 'ai-suggested');
             });
             document.getElementById('score-description').style.display = 'none';
+            document.getElementById('ai-suggested-badge').classList.remove('show');
 
             // Pre-select AI-suggested score
             const suggestedScore = submission.suggestedScore;
@@ -1451,6 +1469,9 @@
             if (suggestedOption) {
                 suggestedOption.classList.add('selected', 'ai-suggested');
                 currentScore = suggestedScore;
+
+                // Show AI suggested badge
+                document.getElementById('ai-suggested-badge').classList.add('show');
 
                 // Show score description
                 const descBox = document.getElementById('score-description');
@@ -1630,6 +1651,9 @@
                 sib.classList.remove('selected', 'ai-suggested');
             });
 
+            // Hide AI suggested badge when user manually selects
+            document.getElementById('ai-suggested-badge').classList.remove('show');
+
             // Add selection to clicked element (without AI indicator)
             element.classList.add('selected');
 
@@ -1679,12 +1703,15 @@
             // Update UI to show submitted state
             isSubmitted = true;
             document.getElementById('submitted-message').classList.add('show');
-            document.getElementById('submit-btn').textContent = 'Resubmit';
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.textContent = 'Resubmit';
+            submitBtn.classList.add('resubmit');
 
             // Remove AI suggested indicator after submission
             document.querySelectorAll('.point-option').forEach(opt => {
                 opt.classList.remove('ai-suggested');
             });
+            document.getElementById('ai-suggested-badge').classList.remove('show');
         }
 
         function previousStudent() {
