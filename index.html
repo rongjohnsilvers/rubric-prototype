@@ -681,8 +681,7 @@
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
-            margin-left: 8px;
-            vertical-align: middle;
+            margin-left: auto;
         }
 
         .ai-suggested-badge.show {
@@ -697,11 +696,15 @@
 
         .submitted-message {
             display: none;
-            align-items: center;
-            gap: 8px;
+            background-color: #fff;
             color: #2e7d32;
+            border: 1px solid #2e7d32;
+            padding: 10px 20px;
+            border-radius: 6px;
             font-weight: 600;
             font-size: 14px;
+            align-items: center;
+            gap: 8px;
         }
 
         .submitted-message.show {
@@ -817,6 +820,48 @@
             background-color: #e65c00;
             border-color: #e65c00;
             color: white;
+        }
+
+        .snippet-chip-remove {
+            margin-left: 4px;
+            font-weight: 700;
+            opacity: 0.7;
+        }
+
+        .snippet-chip-remove:hover {
+            opacity: 1;
+        }
+
+        .snippet-chip-add {
+            background-color: #fff;
+            border: 1px dashed #999;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .snippet-chip-add:hover {
+            background-color: #f9f9f9;
+            border-color: #666;
+            color: #333;
+        }
+
+        .snippet-input {
+            display: none;
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #ff6600;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: inherit;
+            margin-top: 8px;
+        }
+
+        .snippet-input.show {
+            display: block;
+        }
+
+        .snippet-input:focus {
+            outline: none;
         }
     </style>
 </head>
@@ -995,7 +1040,7 @@
 
                             <div class="overall-feedback">
                                 <div class="feedback-snippets">
-                                    <h5>✨ Quick Feedback</h5>
+                                    <h5>Quick Feedback</h5>
 
                                     <div class="snippet-category">
                                         <div class="snippet-category-title">Strengths</div>
@@ -1023,17 +1068,15 @@
                                 <span class="saved-indicator" id="saved-indicator">✓ Progress saved</span>
                             </div>
                             <div class="action-buttons">
-                                <button class="btn-secondary" onclick="saveProgress()">Save & Exit</button>
+                                <button class="btn-secondary" id="save-exit-btn" onclick="saveProgress()">Save & Exit</button>
+                                <div class="submitted-message" id="submitted-message">
+                                    <span>✓ Submitted successfully</span>
+                                </div>
                                 <div class="student-nav">
                                     <button class="nav-btn" onclick="previousStudent()">← Previous</button>
                                     <button class="nav-btn" onclick="nextStudent()">Next →</button>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div class="submitted-message" id="submitted-message">
-                                        <span>✓ Submitted successfully</span>
-                                    </div>
-                                    <button class="btn-primary" id="submit-btn" onclick="submitRubric()">Submit Grade</button>
-                                </div>
+                                <button class="btn-primary" id="submit-btn" onclick="submitRubric()">Submit Grade</button>
                             </div>
                         </div>
                     </div>
@@ -1309,6 +1352,13 @@
             ]
         };
 
+        // Custom snippets added by teacher (persists across all students)
+        const customSnippets = {
+            strengths: [],
+            improvements: [],
+            suggestions: []
+        };
+
         const scoreDescriptions = {
             5: {
                 title: '5 – Excellent',
@@ -1450,6 +1500,7 @@
 
             // Reset submission state
             isSubmitted = false;
+            document.getElementById('save-exit-btn').style.display = 'block';
             document.getElementById('submitted-message').classList.remove('show');
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.textContent = 'Submit Grade';
@@ -1622,24 +1673,58 @@
             element.classList.toggle('selected');
         }
 
+        function addCustomSnippet(category) {
+            const inputId = `snippet-input-${category}`;
+            const input = document.getElementById(inputId);
+
+            if (input.style.display === 'none' || !input.classList.contains('show')) {
+                input.classList.add('show');
+                input.focus();
+            } else {
+                const value = input.value.trim();
+                if (value) {
+                    customSnippets[category].push(value);
+                    input.value = '';
+                    input.classList.remove('show');
+                    renderFeedbackSnippets();
+                }
+            }
+        }
+
+        function removeSnippet(category, index, isCustom) {
+            if (isCustom) {
+                customSnippets[category].splice(index, 1);
+            } else {
+                feedbackSnippets[category].splice(index, 1);
+            }
+            renderFeedbackSnippets();
+        }
+
         function renderFeedbackSnippets() {
-            // Render strengths
-            const strengthsContainer = document.getElementById('snippets-strengths');
-            strengthsContainer.innerHTML = feedbackSnippets.strengths.map(snippet =>
-                `<div class="snippet-chip" onclick="toggleSnippetSelection(this)">${snippet}</div>`
-            ).join('');
+            // Render each category
+            ['strengths', 'improvements', 'suggestions'].forEach(category => {
+                const container = document.getElementById(`snippets-${category}`);
 
-            // Render improvements
-            const improvementsContainer = document.getElementById('snippets-improvements');
-            improvementsContainer.innerHTML = feedbackSnippets.improvements.map(snippet =>
-                `<div class="snippet-chip" onclick="toggleSnippetSelection(this)">${snippet}</div>`
-            ).join('');
+                // Combine default and custom snippets
+                const defaultSnippets = feedbackSnippets[category].map((snippet, index) =>
+                    `<div class="snippet-chip" onclick="toggleSnippetSelection(this)">
+                        ${snippet}
+                        <span class="snippet-chip-remove" onclick="event.stopPropagation(); removeSnippet('${category}', ${index}, false)">×</span>
+                    </div>`
+                );
 
-            // Render suggestions
-            const suggestionsContainer = document.getElementById('snippets-suggestions');
-            suggestionsContainer.innerHTML = feedbackSnippets.suggestions.map(snippet =>
-                `<div class="snippet-chip" onclick="toggleSnippetSelection(this)">${snippet}</div>`
-            ).join('');
+                const customSnippetElements = customSnippets[category].map((snippet, index) =>
+                    `<div class="snippet-chip" onclick="toggleSnippetSelection(this)">
+                        ${snippet}
+                        <span class="snippet-chip-remove" onclick="event.stopPropagation(); removeSnippet('${category}', ${index}, true)">×</span>
+                    </div>`
+                );
+
+                const addButton = `<div class="snippet-chip snippet-chip-add" onclick="addCustomSnippet('${category}')">+ Add</div>`;
+                const input = `<input type="text" id="snippet-input-${category}" class="snippet-input" placeholder="Type and click + Add again to save" onblur="setTimeout(() => { if(document.activeElement.id !== 'snippet-input-${category}') this.classList.remove('show'); }, 200)" onkeypress="if(event.key === 'Enter') addCustomSnippet('${category}')">`;
+
+                container.innerHTML = [...defaultSnippets, ...customSnippetElements, addButton].join('') + input;
+            });
         }
 
         function selectPoints(element) {
@@ -1702,6 +1787,7 @@
 
             // Update UI to show submitted state
             isSubmitted = true;
+            document.getElementById('save-exit-btn').style.display = 'none';
             document.getElementById('submitted-message').classList.add('show');
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.textContent = 'Resubmit';
