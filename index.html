@@ -215,11 +215,19 @@
 
         .student-score {
             font-weight: 600;
-            color: #333;
+            color: #666;
         }
 
-        .student-score.graded {
-            color: #388e3c;
+        .student-score.score-high {
+            color: #2e7d32;
+        }
+
+        .student-score.score-medium {
+            color: #e65100;
+        }
+
+        .student-score.score-low {
+            color: #c62828;
         }
 
         /* Responsive Design */
@@ -1501,9 +1509,20 @@
                     new Date(student.submittedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
                     'Not submitted';
 
-                const scoreDisplay = student.score !== null ?
-                    `<span class="student-score graded">${student.score} / 5</span>` :
-                    '<span class="student-score">—</span>';
+                let scoreDisplay;
+                if (student.score !== null) {
+                    let scoreClass = 'student-score';
+                    if (student.score >= 4) {
+                        scoreClass += ' score-high';
+                    } else if (student.score >= 2) {
+                        scoreClass += ' score-medium';
+                    } else {
+                        scoreClass += ' score-low';
+                    }
+                    scoreDisplay = `<span class="${scoreClass}">${student.score} / 5</span>`;
+                } else {
+                    scoreDisplay = '<span class="student-score">—</span>';
+                }
 
                 return `
                     <div class="student-item" onclick="${student.status === 'inprogress' ? '' : `selectStudent(${originalIndex})`}">
