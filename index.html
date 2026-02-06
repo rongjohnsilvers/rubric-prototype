@@ -431,6 +431,7 @@
             font-size: 14px;
             color: #333;
             margin-bottom: 12px;
+            line-height: 1.4;
         }
 
         .rubric-points {
@@ -685,6 +686,7 @@
             font-size: 11px;
             font-weight: 600;
             margin-left: 12px;
+            line-height: 1;
         }
 
         .ai-suggested-badge.show {
@@ -700,19 +702,13 @@
 
         .submitted-message {
             display: none;
-            background-color: #fff;
             color: #2e7d32;
-            border: 1px solid #2e7d32;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 14px;
-            align-items: center;
-            gap: 8px;
+            font-size: 13px;
+            margin-left: 16px;
         }
 
         .submitted-message.show {
-            display: flex;
+            display: inline;
         }
 
         /* Evidence Highlighting */
@@ -1070,12 +1066,10 @@
                             <div>
                                 <div class="score-display">Score: <span id="current-score">—</span> / 5</div>
                                 <span class="saved-indicator" id="saved-indicator">✓ Progress saved</span>
+                                <span class="submitted-message" id="submitted-message">✓ Submitted successfully</span>
                             </div>
                             <div class="action-buttons">
                                 <button class="btn-secondary" id="save-exit-btn" onclick="saveProgress()">Save & Exit</button>
-                                <div class="submitted-message" id="submitted-message">
-                                    <span>✓ Submitted successfully</span>
-                                </div>
                                 <div class="student-nav">
                                     <button class="nav-btn" onclick="previousStudent()">← Previous</button>
                                     <button class="nav-btn" onclick="nextStudent()">Next →</button>
@@ -1791,7 +1785,6 @@
 
             // Update UI to show submitted state
             isSubmitted = true;
-            document.getElementById('save-exit-btn').style.display = 'none';
             document.getElementById('submitted-message').classList.add('show');
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.textContent = 'Resubmit';
