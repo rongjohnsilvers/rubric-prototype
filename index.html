@@ -1110,18 +1110,18 @@
         let isSubmitted = false;
 
         const students = [
-            { firstName: 'Emma', lastName: 'Thompson', status: 'submitted', submittedDate: '2025-01-28', score: null },
-            { firstName: 'Marcus', lastName: 'Chen', status: 'submitted', submittedDate: '2025-01-29', score: null },
-            { firstName: 'Sophia', lastName: 'Rodriguez', status: 'graded', submittedDate: '2025-01-27', score: 5 },
-            { firstName: 'Aiden', lastName: 'Kumar', status: 'submitted', submittedDate: '2025-01-29', score: null },
-            { firstName: 'Olivia', lastName: 'Washington', status: 'inprogress', submittedDate: null, score: null },
-            { firstName: 'Lucas', lastName: 'Martinez', status: 'submitted', submittedDate: '2025-01-30', score: null },
-            { firstName: 'Isabella', lastName: 'Anderson', status: 'graded', submittedDate: '2025-01-28', score: 4 },
-            { firstName: 'Ethan', lastName: 'Brown', status: 'submitted', submittedDate: '2025-01-29', score: null },
-            { firstName: 'Ava', lastName: 'Davis', status: 'graded', submittedDate: '2025-01-27', score: 5 },
-            { firstName: 'Noah', lastName: 'Garcia', status: 'submitted', submittedDate: '2025-01-30', score: null },
-            { firstName: 'Mia', lastName: 'Johnson', status: 'graded', submittedDate: '2025-01-28', score: 3 },
-            { firstName: 'Liam', lastName: 'Lee', status: 'submitted', submittedDate: '2025-01-29', score: null }
+            { firstName: 'Emma', lastName: 'Thompson', status: 'submitted', submittedDate: '2025-01-28', score: null, feedback: null, selectedSnippets: null },
+            { firstName: 'Marcus', lastName: 'Chen', status: 'submitted', submittedDate: '2025-01-29', score: null, feedback: null, selectedSnippets: null },
+            { firstName: 'Sophia', lastName: 'Rodriguez', status: 'graded', submittedDate: '2025-01-27', score: 5, feedback: null, selectedSnippets: null },
+            { firstName: 'Aiden', lastName: 'Kumar', status: 'submitted', submittedDate: '2025-01-29', score: null, feedback: null, selectedSnippets: null },
+            { firstName: 'Olivia', lastName: 'Washington', status: 'inprogress', submittedDate: null, score: null, feedback: null, selectedSnippets: null },
+            { firstName: 'Lucas', lastName: 'Martinez', status: 'submitted', submittedDate: '2025-01-30', score: null, feedback: null, selectedSnippets: null },
+            { firstName: 'Isabella', lastName: 'Anderson', status: 'graded', submittedDate: '2025-01-28', score: 4, feedback: null, selectedSnippets: null },
+            { firstName: 'Ethan', lastName: 'Brown', status: 'submitted', submittedDate: '2025-01-29', score: null, feedback: null, selectedSnippets: null },
+            { firstName: 'Ava', lastName: 'Davis', status: 'graded', submittedDate: '2025-01-27', score: 5, feedback: null, selectedSnippets: null },
+            { firstName: 'Noah', lastName: 'Garcia', status: 'submitted', submittedDate: '2025-01-30', score: null, feedback: null, selectedSnippets: null },
+            { firstName: 'Mia', lastName: 'Johnson', status: 'graded', submittedDate: '2025-01-28', score: 3, feedback: null, selectedSnippets: null },
+            { firstName: 'Liam', lastName: 'Lee', status: 'submitted', submittedDate: '2025-01-29', score: null, feedback: null, selectedSnippets: null }
         ];
 
         const studentSubmissions = {
@@ -1547,32 +1547,89 @@
             });
             document.getElementById('score-description').style.display = 'none';
 
-            // Pre-select AI-suggested score
-            const suggestedScore = submission.suggestedScore;
-            const suggestedOption = document.querySelector(`.point-option[data-points="${suggestedScore}"]`);
-            if (suggestedOption) {
-                suggestedOption.classList.add('selected', 'ai-suggested');
-                currentScore = suggestedScore;
+            // Pre-select score - use actual score if graded, otherwise AI-suggested score
+            const scoreToSelect = student.status === 'graded' && student.score !== null ? student.score : submission.suggestedScore;
+            const selectedOption = document.querySelector(`.point-option[data-points="${scoreToSelect}"]`);
 
-                // Add AI badge to button
-                const originalText = suggestedOption.textContent;
-                suggestedOption.innerHTML = `${originalText}<span class="ai-badge">✨ AI suggested</span>`;
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+                currentScore = scoreToSelect;
+
+                // Only add AI badge if this is not a graded submission
+                if (student.status !== 'graded') {
+                    selectedOption.classList.add('ai-suggested');
+                    const originalText = selectedOption.textContent;
+                    selectedOption.innerHTML = `${originalText}<span class="ai-badge">✨ AI suggested</span>`;
+                }
 
                 // Show score description
                 const descBox = document.getElementById('score-description');
-                const desc = scoreDescriptions[suggestedScore];
+                const desc = scoreDescriptions[scoreToSelect];
                 document.getElementById('score-title').textContent = desc.title;
                 document.getElementById('score-text').textContent = desc.text;
                 descBox.style.display = 'block';
             }
 
-            // Clear feedback textarea
-            const feedbackTextarea = document.getElementById('feedback-textarea');
-            feedbackTextarea.value = '';
-            autoResizeTextarea(feedbackTextarea);
-
-            // Render feedback snippets and clear selections
+            // Render feedback snippets first
             renderFeedbackSnippets();
+
+            // Restore feedback and selected snippets if student has been graded
+            const feedbackTextarea = document.getElementById('feedback-textarea');
+            if (student.status === 'graded' && student.selectedSnippets) {
+                // Restore selected snippets
+                const snippets = student.selectedSnippets;
+
+                // Restore strengths
+                snippets.strengths.forEach(text => {
+                    const chips = document.querySelectorAll('#snippets-strengths .snippet-chip');
+                    chips.forEach(chip => {
+                        const chipText = chip.childNodes[0].textContent.trim();
+                        if (chipText === text) {
+                            chip.classList.add('selected');
+                        }
+                    });
+                });
+
+                // Restore improvements
+                snippets.improvements.forEach(text => {
+                    const chips = document.querySelectorAll('#snippets-improvements .snippet-chip');
+                    chips.forEach(chip => {
+                        const chipText = chip.childNodes[0].textContent.trim();
+                        if (chipText === text) {
+                            chip.classList.add('selected');
+                        }
+                    });
+                });
+
+                // Restore suggestions
+                snippets.suggestions.forEach(text => {
+                    const chips = document.querySelectorAll('#snippets-suggestions .snippet-chip');
+                    chips.forEach(chip => {
+                        const chipText = chip.childNodes[0].textContent.trim();
+                        if (chipText === text) {
+                            chip.classList.add('selected');
+                        }
+                    });
+                });
+
+                // Restore feedback text
+                feedbackTextarea.value = student.feedback || '';
+                autoResizeTextarea(feedbackTextarea);
+
+                // Update UI to show submitted state
+                isSubmitted = true;
+                document.getElementById('submitted-message').classList.add('show');
+                const submitBtn = document.getElementById('submit-btn');
+                submitBtn.textContent = 'Resubmit';
+                submitBtn.classList.add('resubmit');
+
+                // Update score display
+                currentScore = student.score;
+            } else {
+                // Clear feedback textarea for new grading
+                feedbackTextarea.value = '';
+                autoResizeTextarea(feedbackTextarea);
+            }
 
             updateScore();
             goToPage('page-grading');
@@ -1817,9 +1874,36 @@
 
             const student = students[currentStudentIndex];
 
-            // Update student record with score and status
+            // Collect selected feedback snippets
+            const selectedSnippets = {
+                strengths: [],
+                improvements: [],
+                suggestions: []
+            };
+
+            document.querySelectorAll('#snippets-strengths .snippet-chip.selected').forEach(chip => {
+                const text = chip.childNodes[0].textContent.trim();
+                selectedSnippets.strengths.push(text);
+            });
+
+            document.querySelectorAll('#snippets-improvements .snippet-chip.selected').forEach(chip => {
+                const text = chip.childNodes[0].textContent.trim();
+                selectedSnippets.improvements.push(text);
+            });
+
+            document.querySelectorAll('#snippets-suggestions .snippet-chip.selected').forEach(chip => {
+                const text = chip.childNodes[0].textContent.trim();
+                selectedSnippets.suggestions.push(text);
+            });
+
+            // Get feedback comments
+            const feedbackText = document.getElementById('feedback-textarea').value;
+
+            // Update student record with score, status, feedback, and selected snippets
             students[currentStudentIndex].score = currentScore;
             students[currentStudentIndex].status = 'graded';
+            students[currentStudentIndex].feedback = feedbackText;
+            students[currentStudentIndex].selectedSnippets = selectedSnippets;
 
             // Update UI to show submitted state
             isSubmitted = true;
