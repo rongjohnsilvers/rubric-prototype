@@ -687,7 +687,7 @@
 
         .point-option .ai-badge {
             display: inline-block;
-            font-size: 9px;
+            font-size: 11px;
             margin-left: 6px;
             background-color: #7b1fa2;
             color: #ffffff;
@@ -858,6 +858,51 @@
 
         .snippet-input:focus {
             outline: none;
+        }
+
+        /* Celebration Animation */
+        @keyframes celebrate {
+            0% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.05);
+                background-color: #e8f5e9;
+            }
+            50% {
+                transform: scale(1);
+            }
+            75% {
+                transform: scale(1.03);
+            }
+            100% {
+                transform: scale(1);
+                background-color: #fafafa;
+            }
+        }
+
+        @keyframes confetti {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .action-bar.celebrating {
+            animation: celebrate 0.8s ease-in-out;
+        }
+
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            animation: confetti 1.5s ease-out forwards;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -1798,6 +1843,33 @@
                     badge.remove();
                 }
             });
+
+            // Celebration animation
+            const actionBar = document.querySelector('.action-bar');
+            actionBar.classList.add('celebrating');
+
+            // Create confetti effect
+            const colors = ['#4caf50', '#ff6600', '#1976d2', '#9c27b0', '#ffc107'];
+            const buttonRect = submitBtn.getBoundingClientRect();
+
+            for (let i = 0; i < 20; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                confetti.style.left = (buttonRect.left + buttonRect.width / 2) + 'px';
+                confetti.style.top = (buttonRect.top + buttonRect.height / 2) + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.transform = `translateX(${(Math.random() - 0.5) * 200}px)`;
+                confetti.style.animationDelay = `${Math.random() * 0.1}s`;
+                document.body.appendChild(confetti);
+
+                // Remove confetti after animation
+                setTimeout(() => confetti.remove(), 1500);
+            }
+
+            // Remove celebrating class after animation
+            setTimeout(() => {
+                actionBar.classList.remove('celebrating');
+            }, 800);
         }
 
         function previousStudent() {
